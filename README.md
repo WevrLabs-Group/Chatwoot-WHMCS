@@ -2,8 +2,8 @@
 This add-on module enables you to integrate Chatwoot with your WHMCS installation very easily and leverage its powerful features.
 
 # Installation:
-1. Download the `master` of this repository.
-2. Upload the `chatwoot` folder to the `/modules/addons` directory of your WHMCS installation.
+1. Download the latest release of `chatwoot-whmcs.zip` from this repository.
+2. Upload the `chatwoot-whmcs.zip` folder to the `/modules/addons` directory of your WHMCS installation.
 3. Navigate to `WHMCS Admin > Setup > Addon Modules`, then locate Chatwoot and click on `Activate`.
 4. After addon activation, you will see the settings, start by ticking the `Enable Chatwoot` option, and then obtain your Website JS Code from your Chatwoot account by navigating to `Inboxes > Website` (if you have multiple websites added, click on the website you wish to add). Follow this guide for more details: https://www.chatwoot.com/docs/channels/website
 
