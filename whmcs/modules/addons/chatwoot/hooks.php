@@ -69,7 +69,6 @@ function hook_chatwoot_footer_output($vars) {
                             }
                             window.chatwootSettings = {
                                     position: '$chatwoot_position',
-                                    locale: '$chatwoot_lang',
                             }
                         </script>
                         ";
