@@ -51,9 +51,7 @@ function hook_chatwoot_footer_output($vars) {
 
     // Get client ID
     if ($vars['clientsdetails']['id']) {
-        $hmac = hash_hmac("sha256", $id, "nQ1ayoG5bu580LZkSxMJiO2");
-        $clientid = $hmac;
-        
+        $clientid = $vars['clientsdetails']['id'];
     }
 
     // Get client email
@@ -77,8 +75,6 @@ function hook_chatwoot_footer_output($vars) {
                         <script>
                             window.onload = (event) => {
                                 window.\$chatwoot.setUser('$clientid', {
-                                    email: '$clientemail',
-                                    name: '$clientname',
                                     avatar_url: '$gravatarurl',
                                 })
                                 window.\$chatwoot.setLabel('$chatwoot_label')
