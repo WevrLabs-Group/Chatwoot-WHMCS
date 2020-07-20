@@ -93,9 +93,6 @@ function hook_chatwoot_footer_output($vars) {
 		$chatwoot_output = "$chatwoot_jscode
 							<script>
 								window.onload = (event) => {
-									window.\$chatwoot.setUser('$clientid', {
-										avatar_url: '$gravatarurl',
-									})
 									window.\$chatwoot.setLabel('$chatwoot_label')
 								}
 								window.chatwootSettings = {
