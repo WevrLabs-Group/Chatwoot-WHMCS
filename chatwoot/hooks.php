@@ -2,7 +2,7 @@
 
 /***************************************************************************
 // *                                                                       *
-// * Chatwoot WHMCS Addon (v1.0).                                          *
+// * Chatwoot WHMCS Addon (v1.1).                                          *
 // * This addon modules enables you integrate Chatwoot with your WHMCS     *
 //   and leverage its powerful features.                                   *
 // * Tested on WHMCS Version: 7.9.2 (7.9.2-release.1).                     *
@@ -51,7 +51,12 @@ function hook_chatwoot_footer_output($vars) {
 
     // Get client ID
     if ($vars['clientsdetails']['id']) {
-        $clientid = $vars['clientsdetails']['id'];
+        $varsID = $vars['clientsdetails']['id'];
+    }
+	if (!is_null($client)){
+			$clientid = hash_hmac("sha256", $varsID, "nQ1ayoG5bu580LZkSxMJiO2");
+	} else {
+        	$clientid = uniqid('v-', true);
     }
 
     // Get client email
@@ -75,7 +80,9 @@ function hook_chatwoot_footer_output($vars) {
                         <script>
                             window.onload = (event) => {
                                 window.\$chatwoot.setUser('$clientid', {
-                                    avatar_url: '$gravatarurl',
+                                    email: '$clientemail',
+                                    name: '$clientname',
+									avatar_url: '$gravatarurl',
                                 })
                                 window.\$chatwoot.setLabel('$chatwoot_label')
                             }
