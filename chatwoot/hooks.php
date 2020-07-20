@@ -76,21 +76,40 @@ function hook_chatwoot_footer_output($vars) {
     $gravatarurl = "https://www.gravatar.com/avatar/".md5($clientemail) . "?r=".$rating . "&d=".$default . "&s=".$size; 
 
     
-    $chatwoot_output = "$chatwoot_jscode
-                        <script>
-                            window.onload = (event) => {
-                                window.\$chatwoot.setUser('$clientid', {
-                                    email: '$clientemail',
-                                    name: '$clientname',
-									avatar_url: '$gravatarurl',
-                                })
-                                window.\$chatwoot.setLabel('$chatwoot_label')
-                            }
-                            window.chatwootSettings = {
-                                    position: '$chatwoot_position',
-                            }
-                        </script>
-                        ";
+    if (!is_null($client)){
+		$chatwoot_output = "$chatwoot_jscode
+							<script>
+								window.onload = (event) => {
+									window.\$chatwoot.setUser('$clientid', {
+										email: '$clientemail',
+										name: '$clientname',
+										avatar_url: '$gravatarurl',
+									})
+									window.\$chatwoot.setLabel('$chatwoot_label')
+								}
+								window.chatwootSettings = {
+										email: '$clientemail',
+										position: '$chatwoot_position',
+										locale: '$chatwoot_lang',
+								}
+							</script>
+							";
+		} else {
+		$chatwoot_output = "$chatwoot_jscode
+							<script>
+								window.onload = (event) => {
+									window.\$chatwoot.setUser('$clientid', {
+										avatar_url: '$gravatarurl',
+									})
+									window.\$chatwoot.setLabel('$chatwoot_label')
+								}
+								window.chatwootSettings = {
+										position: '$chatwoot_position',
+										locale: '$chatwoot_lang',
+								}
+							</script>
+							";
+	}
 
      echo $chatwoot_output;
 }
