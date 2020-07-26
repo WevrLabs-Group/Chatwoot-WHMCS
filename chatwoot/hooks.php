@@ -2,7 +2,7 @@
 
 /***************************************************************************
 // *                                                                       *
-// * Chatwoot WHMCS Addon (v1.1).                                          *
+// * Chatwoot WHMCS Addon (v1.2).                                          *
 // * This addon modules enables you integrate Chatwoot with your WHMCS     *
 //   and leverage its powerful features.                                   *
 // * Tested on WHMCS Version: 7.9.2 (7.9.2-release.1).                     *
@@ -79,35 +79,41 @@ function hook_chatwoot_footer_output($vars) {
     if (!is_null($client)){
 		$chatwoot_output = "$chatwoot_jscode
 							<script>
-								window.onload = (event) => {
+								window.addEventListener('chatwoot:ready', function () {
 									window.\$chatwoot.setUser('$clientid', {
 										email: '$clientemail',
 										name: '$clientname',
 										avatar_url: '$gravatarurl',
-									})
+									});
+									
 									window.\$chatwoot.setLabel('$chatwoot_label')
-								}
-								window.chatwootSettings = {
-										position: '$chatwoot_position',
-										locale: '$chatwoot_lang',
-								}
+								
+									window.chatwootSettings = {
+											position: '$chatwoot_position',
+											locale: '$chatwoot_lang',
+									}
+								});
 							</script>
 							";
-		} else {
+		} 
+		else {
 		$chatwoot_output = "$chatwoot_jscode
 							<script>
-								window.onload = (event) => {
+								window.addEventListener('chatwoot:ready', function () {
 									window.\$chatwoot.setLabel('$chatwoot_label')
-								}
-								window.chatwootSettings = {
-										position: '$chatwoot_position',
-										locale: '$chatwoot_lang',
-								}
+									
+									window.chatwootSettings = {
+											position: '$chatwoot_position',
+											locale: '$chatwoot_lang',
+									};
+								});
 							</script>
 							";
-	}
-
-     echo $chatwoot_output;
+		}
+     
+	
+	// Now print JS code 
+	echo $chatwoot_output;
 }
 
 
@@ -118,10 +124,8 @@ function hook_chatwoot_logout_footer_output($vars) {
                             });
                           </script>
                           ";
-
      echo $chatwoot_logoutJS;
 }   
 
 add_hook('ClientAreaFooterOutput', 1, 'hook_chatwoot_footer_output');
-
 add_hook('ClientLogout', 1, 'hook_chatwoot_logout_footer_output');
