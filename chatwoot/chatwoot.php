@@ -2,10 +2,10 @@
 
 /***************************************************************************
 // *                                                                       *
-// * Chatwoot WHMCS Addon (v1.2.1).                                        *
+// * Chatwoot WHMCS Addon (v2.0.0).                                        *
 // * This addon modules enables you integrate Chatwoot with your WHMCS     *
 //   and leverage its powerful features.                                   *
-// * Tested on WHMCS Version: 7.9.2 (7.9.2-release.1).                     *
+// * Tested on WHMCS Version: 7.10.3                                       *
 // * For assistance on how to use and setup Chatwoot, visit                *
 //   https://www.chatwoot.com/docs/channels/website                        *
 // *                                                                       *
@@ -39,6 +39,13 @@ function chatwoot_config()
 							'Cols' => '100',
 							'Default' => '',
 							'Description' => 'Paste your website widget JS code in this field. You can obtain it from your Chatwoot Dashboard > Inboxes > Website > Settings.<br /> For help, visit <a href="https://github.com/WevrLabs-Group/Chatwoot-WHMCS" target="_blank">https://github.com/WevrLabs-Group/Chatwoot-WHMCS</a>',
+            ],
+        'chatwoot_verhash' => [
+							'FriendlyName' => 'Verification Hash',
+							'Type' => 'text',
+							'Size' => '',
+							'Default' => '',
+							'Description' => 'The key used to generate HMAC for each webwidget is different and can be copied from Inboxes -> Settings -> Configuration -> Identity Validation -> Copy the token shown there',
             ],
 		'chatwoot_position' => [
 							'FriendlyName' => 'Chat Box Position',

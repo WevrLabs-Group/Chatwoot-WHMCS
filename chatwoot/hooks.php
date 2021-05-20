@@ -2,10 +2,10 @@
 
 /***************************************************************************
 // *                                                                       *
-// * Chatwoot WHMCS Addon (v1.2.1).                                        *
+// * Chatwoot WHMCS Addon (v2.0.0).                                        *
 // * This addon modules enables you integrate Chatwoot with your WHMCS     *
 //   and leverage its powerful features.                                   *
-// * Tested on WHMCS Version: 7.9.2 (7.9.2-release.1).                     *
+// * Tested on WHMCS Version: 7.10.3                                       *
 // * For assistance on how to use and setup Chatwoot, visit                *
 //   https://www.chatwoot.com/docs/channels/website                        *
 // *                                                                       *
@@ -26,95 +26,155 @@ use WHMCS\Database\Capsule;
 function hook_chatwoot_footer_output($vars) {
     
     $chatwoot_jscode = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_jscode')->value('value');
+
+    $verification_hash = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
+
     $chatwoot_position = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_position')->value('value');
+
     $chatwoot_setlabel = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_setlabel')->value('value');
     $chatwoot_setlabelloggedin = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_setlabelloggedin')->value('value');
-    $isenabled =  Capsule::table('tbladdonmodules')->select('value')-> WHERE('module', '=' , 'chatwoot')->WHERE('setting' , '=', 'chatwoot_enable')->WHERE('value' , 'on')->count();   
+
+    $isenabled =  Capsule::table('tbladdonmodules')->select('value')->where('module', '=' , 'chatwoot')->where('setting' , '=', 'chatwoot_enable')->where('value' , 'on')->count();   
 	
 	// Disable or Enable Chatwoot
 	if (empty($isenabled)) {
         return;
     }
+    	
     
-    if(!$chatwoot_jscode) {
-        return;
-    }
-	
-    
-    // Fetch labels
     $client = Menu::context('client');
+    
+
+    $ipaddress =  $_SERVER['REMOTE_ADDR'];
+    $IP = gethostbyaddr($ipaddress);
+    
+
+    // Fetch labels
     if (!is_null($client)){
         $chatwoot_label = $chatwoot_setlabelloggedin;
-        } else {
-        $chatwoot_label = $chatwoot_setlabel;
     }
 
-    // Get client ID
-    if ($vars['clientsdetails']['id']) {
-        $varsID = $vars['clientsdetails']['id'];
-    }
-	if (!is_null($client)){
-			$clientid = hash_hmac("sha256", $varsID, "S0m3r@nd0m5tring");
-	} else {
-        	$clientid = uniqid('v-', true);
-    }
 
-    // Get client email
-    if ($vars['clientsdetails']['email']) {
-        $clientemail = $vars['clientsdetails']['email'];
+    // Get client ID and set client chat ID
+    if (!is_null($client)){
+        if ($vars['clientsdetails']['id']) {
+            $ClientID = $vars['clientsdetails']['id'];
+        }
     }
-
-    // Get First and Last name
-    if ($vars['clientsdetails']['firstname']) {
-        $clientname = $vars['clientsdetails']['firstname'] . " " . $vars['clientsdetails']['lastname'];
-    }
-
-    // Fetch client avatar if any
-    $rating = (isset($params['rating']) ? $params['rating'] : 'G');
-    $default = (isset($params['default']) ? $params['default'] : 'mp');
-    $size = (isset($params['size']) ? $params['size'] : '150'); 
-    $gravatarurl = "https://www.gravatar.com/avatar/".md5($clientemail) . "?r=".$rating . "&d=".$default . "&s=".$size; 
-
     
     if (!is_null($client)){
-		$chatwoot_output = "$chatwoot_jscode
-			<script>
-				window.addEventListener('chatwoot:ready', function () {
-					window.\$chatwoot.setUser('$clientid', {
-						email: '$clientemail',
-						name: '$clientname',
-						avatar_url: '$gravatarurl',
-					});
+            $ClientChatID = hash_hmac("sha256", $ClientID, "S0m3r@nd0m5tring");
+            $identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
+    } 
 
-					window.\$chatwoot.setLabel('$chatwoot_label')
-					window.\$chatwoot.removeLabel('$chatwoot_setlabel')
+    // Set params for getting Client Info
+    if (!is_null($client)) {
 
-					window.chatwootSettings = {
-						position: '$chatwoot_position',
-						locale: '$chatwoot_lang',
-					}
-				});
-			</script>
-			";
-		} 
-		else {
-		$chatwoot_output = "$chatwoot_jscode
-			<script>
-				window.addEventListener('chatwoot:ready', function () {
-					window.\$chatwoot.setLabel('$chatwoot_label')
+        $apiPostData = array('clientid' => $ClientID,'stats' => true);
+        $apiResults = localAPI(GetClientsDetails, $apiPostData);
+        
+        // Client Info
+        $clientemail = $apiResults['client']['email'];
+        $clientname = $apiResults['client']['fullname'];
+        $clientphone = $apiResults['client']['phonenumberformatted'];
+        $clientcompany = $apiResults['client']['companyname'];
+        $clientcountry = $apiResults['client']['countryname'];
+        $clientlang = $apiResults['client']['language'];
 
-					window.chatwootSettings = {
-						position: '$chatwoot_position',
-						locale: '$chatwoot_lang',
-					};
-				});
-			</script>
-			";
-		}
-     
-	
-	// Now print JS code 
-	echo $chatwoot_output;
+        // Extra Meta
+        $clienttickets = $apiResults['stats']['numactivetickets'];
+        $clientcredit = $apiResults['stats']['creditbalance'];
+        $clientrevenue = $apiResults['stats']['income'];
+        $clientunpaid = $apiResults['stats']['numunpaidinvoices'];
+        // $clientunpaidtotal = $apiResults['stats']['unpaidinvoicesamount'];
+        $clientoverdue = $apiResults['stats']['numoverdueinvoices'];
+        // $clientoverduetotal = $apiResults['stats']['overdueinvoicesbalance'];
+        $isClientAffiliate = $apiResults["stats"]["isAffiliate"];
+        $clientemailstatus = $apiResults["email_verified"];
+
+        // Is Email Verified?
+        if ($clientemailstatus == true) {
+            $clientemailver = 'Verified';
+        } else {
+            $clientemailver ='Not Verified';
+        }
+
+        // Is Client an Affiliate?
+        if ($isClientAffiliate == 1) {
+            $clientaffiliate = 'Yes';
+        } else {
+            $clientaffiliate = 'No';
+        }
+    }
+
+    // Now let's prepare our code for final output
+
+    if (!is_null($client)) {
+
+        $chatwoot_output = "$chatwoot_jscode
+                <script>
+                    window.addEventListener('chatwoot:ready', function () {
+                        window.\$chatwoot.setUser('$ClientChatID', {
+                            email: '$clientemail',
+                            name: '$clientname',
+                            identifier_hash: '$identifier_hash'
+                        });
+
+                        window.\$chatwoot.setCustomAttributes({
+                            ID: '$ClientID',
+                            Phone: '$clientphone',
+                            Language: '$clientlang',
+                            //Country: '$clientcountry',
+                            Company: '$clientcompany',
+                            'Active Tickets': '$clienttickets',
+                            'Credit Balance': '$clientcredit',
+                            'Revenue': '$clientrevenue',
+                            'Unpaid Invoices': '$clientunpaid',
+                            'Account Unpaid': '$clientunpaidtotal',
+                            'Overdue Invoices': '$clientoverdue',
+                            'Account Overdue': '$clientoverduetotal',
+                            'Email Status': '$clientemailver',
+                            'Is Affiliate': '$clientaffiliate',
+                            'IP Address': '$IP',
+                        });
+
+                        window.\$chatwoot.setLabel('$chatwoot_label')
+                        window.\$chatwoot.deleteCustomAttribute('Balance')
+                        window.\$chatwoot.deleteCustomAttribute('Account Balance')
+                        window.\$chatwoot.deleteCustomAttribute('Overdue Total')
+                        window.\$chatwoot.deleteCustomAttribute('Unpaid Total')
+                        window.\$chatwoot.deleteCustomAttribute('Total Revenue')
+                        window.\$chatwoot.deleteCustomAttribute('Account Number')
+
+                        window.chatwootSettings = {
+                            position: '$chatwoot_position',
+                            locale: '$chatwoot_lang',
+                        }
+                    });
+                </script>
+                ";
+        }
+        else {
+            $chatwoot_output = "$chatwoot_jscode
+                <script>
+                    window.addEventListener('chatwoot:ready', function () {
+                        window.\$chatwoot.setLabel('$chatwoot_label')
+
+                        window.chatwootSettings = {
+                            position: '$chatwoot_position',
+                            locale: '$chatwoot_lang',
+                        };
+                        
+                        window.\$chatwoot.setCustomAttributes({
+                            'IP Address': '$IP',
+                        });
+                    });
+                </script>
+                ";
+        }
+
+    echo $chatwoot_output;
+
 }
 
 
