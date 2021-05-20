@@ -41,7 +41,6 @@ function hook_chatwoot_footer_output($vars) {
         return;
     }
     	
-    
     $client = Menu::context('client');
     
     $ipaddress =  $_SERVER['REMOTE_ADDR'];
@@ -109,7 +108,10 @@ function hook_chatwoot_footer_output($vars) {
 
     if (!is_null($client)) {
 
-        $chatwoot_output = "$chatwoot_jscode
+        $chatwoot_output = "<!-- Chatwoot JS Code -->
+                $chatwoot_jscode
+                <!-- Chatwoot End JS Code -->
+                <!-- Chatwoot Begin Meta Code -->
                 <script>
                     window.addEventListener('chatwoot:ready', function () {
                         window.\$chatwoot.setUser('$ClientChatID', {
@@ -150,10 +152,13 @@ function hook_chatwoot_footer_output($vars) {
                         }
                     });
                 </script>
-                ";
+                <!-- Chatwoot End Meta Code -->";
         }
         else {
-            $chatwoot_output = "$chatwoot_jscode
+            $chatwoot_output = "<!-- Chatwoot JS Code -->
+                $chatwoot_jscode
+                <!-- Chatwoot End JS Code -->
+                <!-- Chatwoot Begin Meta Code -->
                 <script>
                     window.addEventListener('chatwoot:ready', function () {
                         window.\$chatwoot.setLabel('$chatwoot_label')
@@ -168,23 +173,24 @@ function hook_chatwoot_footer_output($vars) {
                         });
                     });
                 </script>
-                ";
+                <!-- Chatwoot End Meta Code -->";
         }
 
-    echo $chatwoot_output;
+    return $chatwoot_output;
 
 }
 
 
 function hook_chatwoot_logout_footer_output($vars) {
-    $chatwoot_logoutJS = "<script>
-                            document.addEventListener('readystatechange', event => {
-                                window.\$chatwoot.reset()
-                            });
-                          </script>
-                          ";
-     echo $chatwoot_logoutJS;
+    $chatwoot_logoutJS = "<!-- Chatwoot Logout Code -->
+            <script>
+                document.addEventListener('readystatechange', event => {
+                    window.\$chatwoot.reset()
+                });
+            </script>
+            <!-- Chatwoot End Logout Code -->";
+     return $chatwoot_logoutJS;
 }   
 
-add_hook('ClientAreaFooterOutput', 1, 'hook_chatwoot_footer_output');
+add_hook('ClientAreaHeaderOutput', 1, 'hook_chatwoot_footer_output');
 add_hook('ClientLogout', 1, 'hook_chatwoot_logout_footer_output');
