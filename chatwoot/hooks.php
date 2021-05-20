@@ -114,6 +114,7 @@ function hook_chatwoot_footer_output($vars) {
         $chatwoot_output = "<!-- Chatwoot JS Code -->
                 $chatwoot_jscode
                 <!-- Chatwoot End JS Code -->
+                <!-- --- -->
                 <!-- Chatwoot Begin Meta Code -->
                 <script>
                     window.addEventListener('chatwoot:ready', function () {
@@ -146,11 +147,6 @@ function hook_chatwoot_footer_output($vars) {
 
                         window.\$chatwoot.setLabel('$chatwoot_label')
                         window.\$chatwoot.deleteCustomAttribute('Balance')
-                        window.\$chatwoot.deleteCustomAttribute('Account Balance')
-                        window.\$chatwoot.deleteCustomAttribute('Overdue Total')
-                        window.\$chatwoot.deleteCustomAttribute('Unpaid Total')
-                        window.\$chatwoot.deleteCustomAttribute('Total Revenue')
-                        window.\$chatwoot.deleteCustomAttribute('Account Number')
 
                         window.chatwootSettings = {
                             position: '$chatwoot_position',
@@ -164,6 +160,7 @@ function hook_chatwoot_footer_output($vars) {
             $chatwoot_output = "<!-- Chatwoot JS Code -->
                 $chatwoot_jscode
                 <!-- Chatwoot End JS Code -->
+                <!-- --- -->
                 <!-- Chatwoot Begin Meta Code -->
                 <script>
                     window.addEventListener('chatwoot:ready', function () {
@@ -195,7 +192,7 @@ function hook_chatwoot_logout_footer_output($vars) {
                 });
             </script>
             <!-- Chatwoot End Logout Code -->";
-     return $chatwoot_logoutJS;
+     echo $chatwoot_logoutJS;
 }   
 
 add_hook('ClientAreaHeaderOutput', 1, 'hook_chatwoot_footer_output');
