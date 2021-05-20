@@ -76,6 +76,9 @@ function hook_chatwoot_footer_output($vars) {
         $clientphone = $apiResults['client']['phonenumberformatted'];
         $clientcompany = $apiResults['client']['companyname'];
         $clientcountry = $apiResults['client']['countryname'];
+        $clientcity = $apiResults['client']['city'];
+        $clientstate = $apiResults['client']['fullstate'];
+        $clientpostcode = $apiResults['client']['postcode'];
         $clientlang = $apiResults['client']['language'];
 
         // Extra Meta
@@ -124,7 +127,10 @@ function hook_chatwoot_footer_output($vars) {
                             ID: '$ClientID',
                             Phone: '$clientphone',
                             Language: '$clientlang',
-                            //Country: '$clientcountry',
+                            City: '$clientcity',
+                            State: '$clientstate',
+                            'Post Code': '$clientpostcode',
+                            Country: '$clientcountry',
                             Company: '$clientcompany',
                             'Active Tickets': '$clienttickets',
                             'Credit Balance': '$clientcredit',
