@@ -37,7 +37,7 @@ function hook_chatwoot_footer_output($vars) {
     $isenabled =  Capsule::table('tbladdonmodules')->select('value')->where('module', '=' , 'chatwoot')->where('setting' , '=', 'chatwoot_enable')->where('value' , 'on')->count();   
 	
 	// Disable or Enable Chatwoot
-	if (empty($isenabled)) {
+    if (empty($isenabled)) {
         return;
     }
     	
