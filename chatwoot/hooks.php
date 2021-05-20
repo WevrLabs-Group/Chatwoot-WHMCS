@@ -46,7 +46,7 @@ function hook_chatwoot_footer_output($vars) {
     
 
     $ipaddress =  $_SERVER['REMOTE_ADDR'];
-    $IP = gethostbyaddr($ipaddress);
+    $ip = gethostbyaddr($ipaddress);
     
 
     // Fetch labels
@@ -135,7 +135,7 @@ function hook_chatwoot_footer_output($vars) {
                             'Account Overdue': '$clientoverduetotal',
                             'Email Status': '$clientemailver',
                             'Is Affiliate': '$clientaffiliate',
-                            'IP Address': '$IP',
+                            'IP Address': '$ip',
                         });
 
                         window.\$chatwoot.setLabel('$chatwoot_label')
@@ -166,7 +166,7 @@ function hook_chatwoot_footer_output($vars) {
                         };
                         
                         window.\$chatwoot.setCustomAttributes({
-                            'IP Address': '$IP',
+                            'IP Address': '$ip',
                         });
                     });
                 </script>
