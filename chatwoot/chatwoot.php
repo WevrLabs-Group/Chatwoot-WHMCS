@@ -45,7 +45,7 @@ function chatwoot_config()
 							'Type' => 'text',
 							'Size' => '',
 							'Default' => '',
-							'Description' => 'The key used to generate HMAC for each webwidget is different and can be copied from Inboxes -> Settings -> Configuration -> Identity Validation -> Copy the token shown there',
+							'Description' => 'To make sure the conversations between the customers and the support agents are private and to disallow impersonation, you can setup identity validation Chatwoot. <br />The key used to generate HMAC for each webwidget is different and can be copied from Inboxes -> Settings -> Configuration -> Identity Validation -> Copy the token shown there',
             ],
 		'chatwoot_position' => [
 							'FriendlyName' => 'Chat Box Position',
