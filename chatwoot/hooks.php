@@ -36,7 +36,7 @@ function hook_chatwoot_footer_output($vars) {
 
     $isenabled =  Capsule::table('tbladdonmodules')->select('value')->where('module', '=' , 'chatwoot')->where('setting' , '=', 'chatwoot_enable')->where('value' , 'on')->count();   
 	
-	// Disable or Enable Chatwoot
+    // Disable or Enable Chatwoot
     if (empty($isenabled)) {
         return;
     }
@@ -44,16 +44,14 @@ function hook_chatwoot_footer_output($vars) {
     
     $client = Menu::context('client');
     
-
     $ipaddress =  $_SERVER['REMOTE_ADDR'];
     $ip = gethostbyaddr($ipaddress);
-    
+
 
     // Fetch labels
     if (!is_null($client)){
         $chatwoot_label = $chatwoot_setlabelloggedin;
     }
-
 
     // Get client ID and set client chat ID
     if (!is_null($client)){
