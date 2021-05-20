@@ -52,7 +52,7 @@ function hook_chatwoot_footer_output($vars) {
         $chatwoot_label = $chatwoot_setlabelloggedin;
     }
 
-    // Get client ID and set client chat ID
+    // Get client ID and set chat ID
     if (!is_null($client)){
         if ($vars['clientsdetails']['id']) {
             $ClientID = $vars['clientsdetails']['id'];
@@ -64,7 +64,7 @@ function hook_chatwoot_footer_output($vars) {
             $identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
     } 
 
-    // Set params for getting Client Info
+    // getting Client Info
     if (!is_null($client)) {
 
         $apiPostData = array('clientid' => $ClientID,'stats' => true);
