@@ -41,7 +41,7 @@ function chatwoot_config()
 							'Description' => 'Paste your website widget JS code in this field. You can obtain it from your Chatwoot Dashboard > Inboxes > Website > Settings.<br /> For help, visit <a href="https://github.com/WevrLabs-Group/Chatwoot-WHMCS" target="_blank">https://github.com/WevrLabs-Group/Chatwoot-WHMCS</a>',
             ],
         'chatwoot_verhash' => [
-							'FriendlyName' => 'Verification Hash',
+							'FriendlyName' => 'Verification Hash (Required)',
 							'Type' => 'text',
 							'Size' => '',
 							'Default' => '',
