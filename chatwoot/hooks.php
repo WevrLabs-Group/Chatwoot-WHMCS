@@ -195,5 +195,10 @@ function hook_chatwoot_logout_footer_output($vars) {
      echo $chatwoot_logoutJS;
 }   
 
+	$whmcsversion = Capsule::table('tblconfiguration')->where('setting','Version')->value('value');
+    $whmcsver = substr($whmcsversion,0,1);
+    if ($whmcsver > 7) {$ClientAreaPageLogout = 'ClientLogout';}
+    else {$ClientAreaPageLogout = 'ClientAreaPageLogout';}
+
 add_hook('ClientAreaHeaderOutput', 1, 'hook_chatwoot_footer_output');
-add_hook('ClientLogout', 1, 'hook_chatwoot_logout_footer_output');
+add_hook($ClientAreaPageLogout, 1, 'hook_chatwoot_logout_footer_output');
