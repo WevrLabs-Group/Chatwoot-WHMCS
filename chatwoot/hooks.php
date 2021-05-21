@@ -111,53 +111,55 @@ function hook_chatwoot_footer_output($vars) {
 
     if (!is_null($client)) {
 
-        $chatwoot_output = "<!-- Chatwoot JS Code -->
+        $chatwoot_output = "
+        	<!-- Chatwoot JS Code -->
                 $chatwoot_jscode
-                <!-- Chatwoot End JS Code -->
-                <!-- --- -->
-                <!-- Chatwoot Begin Meta Code -->
-                <script>
-                    window.addEventListener('chatwoot:ready', function () {
-                        window.\$chatwoot.setUser('$ClientChatID', {
-                            email: '$clientemail',
-                            name: '$clientname',
-                            identifier_hash: '$identifier_hash'
-                        });
-
-                        window.\$chatwoot.setCustomAttributes({
-                            ID: '$ClientID',
-                            Phone: '$clientphone',
-                            Language: '$clientlang',
-                            City: '$clientcity',
-                            State: '$clientstate',
-                            'Post Code': '$clientpostcode',
-                            Country: '$clientcountry',
-                            Company: '$clientcompany',
-                            'Active Tickets': '$clienttickets',
-                            'Credit Balance': '$clientcredit',
-                            'Revenue': '$clientrevenue',
-                            'Unpaid Invoices': '$clientunpaid',
-                            'Account Unpaid': '$clientunpaidtotal',
-                            'Overdue Invoices': '$clientoverdue',
-                            'Account Overdue': '$clientoverduetotal',
-                            'Email Status': '$clientemailver',
-                            'Is Affiliate': '$clientaffiliate',
-                            'IP Address': '$ip',
-                        });
-
-                        window.\$chatwoot.setLabel('$chatwoot_label')
-                        window.\$chatwoot.deleteCustomAttribute('Balance')
-
-                        window.chatwootSettings = {
-                            position: '$chatwoot_position',
-                            locale: '$chatwoot_lang',
-                        }
+            <!-- Chatwoot End JS Code -->
+            <!-- --- -->
+            <!-- Chatwoot Begin Meta Code -->
+            <script>
+                window.addEventListener('chatwoot:ready', function () {
+                    window.\$chatwoot.setUser('$ClientChatID', {
+                        email: '$clientemail',
+                        name: '$clientname',
+                        identifier_hash: '$identifier_hash'
                     });
-                </script>
-                <!-- Chatwoot End Meta Code -->";
+
+                    window.\$chatwoot.setCustomAttributes({
+                        ID: '$ClientID',
+                        Phone: '$clientphone',
+                        Language: '$clientlang',
+                        City: '$clientcity',
+                        State: '$clientstate',
+                        'Post Code': '$clientpostcode',
+                        Country: '$clientcountry',
+                        Company: '$clientcompany',
+                        'Active Tickets': '$clienttickets',
+                        'Credit Balance': '$clientcredit',
+                        'Revenue': '$clientrevenue',
+                        'Unpaid Invoices': '$clientunpaid',
+                        'Account Unpaid': '$clientunpaidtotal',
+                        'Overdue Invoices': '$clientoverdue',
+                        'Account Overdue': '$clientoverduetotal',
+                        'Email Status': '$clientemailver',
+                        'Is Affiliate': '$clientaffiliate',
+                        'IP Address': '$ip',
+                    });
+
+                    window.\$chatwoot.setLabel('$chatwoot_label')
+                    window.\$chatwoot.deleteCustomAttribute('Test Attribute')
+
+                    window.chatwootSettings = {
+                        position: '$chatwoot_position',
+                        locale: '$chatwoot_lang',
+                    }
+                });
+            </script>
+            <!-- Chatwoot End Meta Code -->";
         }
         else {
-            $chatwoot_output = "<!-- Chatwoot JS Code -->
+            $chatwoot_output = "
+            	<!-- Chatwoot JS Code -->
                 $chatwoot_jscode
                 <!-- Chatwoot End JS Code -->
                 <!-- --- -->
