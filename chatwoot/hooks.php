@@ -193,8 +193,8 @@ function hook_chatwoot_logout_output($vars) {
 
     $whmcsversion = Capsule::table('tblconfiguration')->where('setting','Version')->value('value');
     $whmcsver = substr($whmcsversion,0,1);
-    if ($whmcsver > 7) {$ClientAreaPageLogout = 'UserLogout';}
-    else {$ClientAreaPageLogout = 'ClientLogout';}
+    if ($whmcsver > 7) {$LogoutHook = 'UserLogout';}
+    else {$LogoutHook = 'ClientLogout';}
 
 add_hook('ClientAreaHeadOutput', 1, 'hook_chatwoot_output');
-add_hook($ClientAreaPageLogout, 1, 'hook_chatwoot_logout_output');
+add_hook($LogoutHook, 1, 'hook_chatwoot_logout_output');
