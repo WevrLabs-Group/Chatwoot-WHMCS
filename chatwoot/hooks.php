@@ -23,7 +23,7 @@ if(!defined("WHMCS")) {
 
 use WHMCS\Database\Capsule;
 
-function hook_chatwoot_footer_output($vars) {
+function hook_chatwoot_output($vars) {
     
     $chatwoot_jscode = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_jscode')->value('value');
 
@@ -35,12 +35,12 @@ function hook_chatwoot_footer_output($vars) {
     $chatwoot_setlabelloggedin = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_setlabelloggedin')->value('value');
 
     $isenabled =  Capsule::table('tbladdonmodules')->select('value')->where('module', '=' , 'chatwoot')->where('setting' , '=', 'chatwoot_enable')->where('value' , 'on')->count();   
-	
+
     // Disable or Enable Chatwoot
     if (empty($isenabled)) {
         return;
     }
-    	
+
     $client = Menu::context('client');
     
     $ipaddress =  $_SERVER['REMOTE_ADDR'];
@@ -112,9 +112,8 @@ function hook_chatwoot_footer_output($vars) {
     if (!is_null($client)) {
 
         $chatwoot_output = "
-        	<!-- Chatwoot JS Code -->
+            <!-- Chatwoot JS Code -->
                 $chatwoot_jscode
-            <!-- Chatwoot End JS Code -->
             <!-- --- -->
             <!-- Chatwoot Begin Meta Code -->
             <script>
@@ -124,7 +123,6 @@ function hook_chatwoot_footer_output($vars) {
                         name: '$clientname',
                         identifier_hash: '$identifier_hash'
                     });
-
                     window.\$chatwoot.setCustomAttributes({
                         ID: '$ClientID',
                         Phone: '$clientphone',
@@ -145,10 +143,8 @@ function hook_chatwoot_footer_output($vars) {
                         'Is Affiliate': '$clientaffiliate',
                         'IP Address': '$ip',
                     });
-
                     window.\$chatwoot.setLabel('$chatwoot_label')
                     window.\$chatwoot.deleteCustomAttribute('Test Attribute')
-
                     window.chatwootSettings = {
                         position: '$chatwoot_position',
                         locale: '$chatwoot_lang',
@@ -159,15 +155,13 @@ function hook_chatwoot_footer_output($vars) {
         }
         else {
             $chatwoot_output = "
-            	<!-- Chatwoot JS Code -->
+                <!-- Chatwoot JS Code -->
                 $chatwoot_jscode
-                <!-- Chatwoot End JS Code -->
                 <!-- --- -->
                 <!-- Chatwoot Begin Meta Code -->
                 <script>
                     window.addEventListener('chatwoot:ready', function () {
                         window.\$chatwoot.setLabel('$chatwoot_label')
-
                         window.chatwootSettings = {
                             position: '$chatwoot_position',
                             locale: '$chatwoot_lang',
@@ -186,7 +180,7 @@ function hook_chatwoot_footer_output($vars) {
 }
 
 
-function hook_chatwoot_logout_footer_output($vars) {
+function hook_chatwoot_logout_output($vars) {
     $chatwoot_logoutJS = "<!-- Chatwoot Logout Code -->
             <script>
                 document.addEventListener('readystatechange', event => {
@@ -197,10 +191,10 @@ function hook_chatwoot_logout_footer_output($vars) {
      echo $chatwoot_logoutJS;
 }
 
-	$whmcsversion = Capsule::table('tblconfiguration')->where('setting','Version')->value('value');
-	$whmcsver = substr($whmcsversion,0,1);
-	if ($whmcsver > 7) {$ClientAreaPageLogout = 'UserLogout';}
-	else {$ClientAreaPageLogout = 'ClientLogout';}
+    $whmcsversion = Capsule::table('tblconfiguration')->where('setting','Version')->value('value');
+    $whmcsver = substr($whmcsversion,0,1);
+    if ($whmcsver > 7) {$ClientAreaPageLogout = 'UserLogout';}
+    else {$ClientAreaPageLogout = 'ClientLogout';}
 
-add_hook('ClientAreaHeadOutput', 1, 'hook_chatwoot_footer_output');
-add_hook($ClientAreaPageLogout, 1, 'hook_chatwoot_logout_footer_output');
+add_hook('ClientAreaHeadOutput', 1, 'hook_chatwoot_output');
+add_hook($ClientAreaPageLogout, 1, 'hook_chatwoot_logout_output');
