@@ -29,6 +29,8 @@ function hook_chatwoot_output($vars) {
 
 	$chatwoot_jscode = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_jscode')->value('value');
 
+	$signing_hash = Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->value('value');
+
 	$verification_hash = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
 
 	$chatwoot_position = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_position')->value('value');
@@ -61,7 +63,7 @@ function hook_chatwoot_output($vars) {
 	}
 
 	if (!is_null($client)) {
-		$ClientChatID = hash_hmac("sha256", $ClientID, "S0m3r@nd0m5tring");
+		$ClientChatID = hash_hmac("sha256", $ClientID, $signing_hash);
 		$identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
 	}
 
