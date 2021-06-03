@@ -23,7 +23,7 @@ if ( !defined( "WHMCS" ) ) {
 
 use WHMCS\ Database\ Capsule;
 
-function hook_chatwoot_footer_output( $vars ) {
+function hook_chatwoot_output( $vars ) {
 
     if(isset($_SESSION['adminid']))
     {
@@ -191,7 +191,7 @@ if ( $whmcsver > 7 ) {
   $ClientAreaPageLogout = 'ClientLogout';
 }
 
-add_hook( 'ClientAreaHeadOutput', 1000, 'hook_chatwoot_footer_output' );
+add_hook( 'ClientAreaHeadOutput', 1000, 'hook_chatwoot_output' );
 add_hook( $ClientAreaPageLogout, 1, 'hook_chatwoot_logout_footer_output' );
 
 
