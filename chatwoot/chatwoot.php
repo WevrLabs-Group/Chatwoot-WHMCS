@@ -5,7 +5,7 @@
 // * Chatwoot WHMCS Addon (v2.0.0).                                        *
 // * This addon modules enables you integrate Chatwoot with your WHMCS     *
 //   and leverage its powerful features.                                   *
-// * Tested on WHMCS Version: 7.10.3                                       *
+// * Tested on WHMCS Version: 7.10.3 up to v8.2.0                          *
 // * For assistance on how to use and setup Chatwoot, visit                *
 //   https://www.chatwoot.com/docs/channels/website                        *
 // *                                                                       *
@@ -54,7 +54,7 @@ function chatwoot_config()
     return array(
         "name"        => "Chatwoot",
         "description" => "Chatwoot is a customer support tool for instant messaging channels which can help businesses to provide exceptional customer support. WHMCS module contributed by: <a href='https://wevrlabs.net/?utm_source=addon_link' target='_blank'>WevrLabs Hosting</a>",
-        "version"     => "1.0",
+        "version"     => "2.0.0",
         "author"      => "<a href='https://github.com/WevrLabs-Group/Chatwoot-WHMCS' target='_blank'><img alt='' width='100px' src='' /><br />contributed by WevrLabs Hosting</a>",
         "fields"      => array(
             'chatwoot_enable'           => [
