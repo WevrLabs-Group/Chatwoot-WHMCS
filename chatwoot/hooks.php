@@ -174,7 +174,7 @@ function hook_chatwoot_output($vars)
     return $chatwoot_output;
 }
 
-function hook_chatwoot_logout_footer_output($vars)
+function hook_chatwoot_logout_output($vars)
 {
     $chatwoot_logoutJS = "
 		<script>
