@@ -70,7 +70,7 @@ function chatwoot_config()
                 'Rows'         => '15',
                 'Cols'         => '100',
                 'Default'      => '',
-                'Description'  => 'Paste your website widget JS code in this field. You can obtain it from your Chatwoot Dashboard > Inboxes > Website > Settings.<br /> For help, visit <a href="https://github.com/WevrLabs-Group/Chatwoot-WHMCS" target="_blank">https://github.com/WevrLabs-Group/Chatwoot-WHMCS</a>',
+                'Description'  => 'Paste your website widget JS code in this field. You can obtain it from your Chatwoot Dashboard > Inboxes > Website > Settings.<br /> For help, visit <a href="https://www.chatwoot.com/docs/product/channels/live-chat/create-website-channel" target="_blank">Chatwoot Docs</a>',
             ],
             'chatwoot_verhash'          => [
                 'FriendlyName' => 'Verification Hash (Required)',
@@ -86,6 +86,20 @@ function chatwoot_config()
                 'Default'      => 'right',
                 'Description'  => 'Set your chat box position, whether to be left or right in the page.',
             ],
+            'chatwoot_bubble'           => [
+                'FriendlyName' => 'Chat Box Bubble',
+                'Type'         => 'radio',
+                'Options'      => 'Standard,Expanded Bubble',
+                'Default'      => 'Standard',
+                'Description'  => 'Set the chat box bubble design. Read more at <a href="https://www.chatwoot.com/docs/product/channels/live-chat/sdk/setup#widget-designs" target="_blank">Chatwoot Docs</a>.',
+            ],
+            'chatwoot_lang'             => [
+                'FriendlyName' => 'Dynamic Language',
+                'Type'         => 'yesno',
+                'Size'         => '55',
+                'Default'      => 'no',
+                'Description'  => 'check this box to set the chat box language according to current WHMCS clientarea langauge preference.',
+            ],
             'chatwoot_setlabel'         => [
                 'FriendlyName' => 'Default non-logged In Conversation Label',
                 'Type'         => 'text',
@@ -99,6 +113,13 @@ function chatwoot_config()
                 'Size'         => '15',
                 'Default'      => '',
                 'Description'  => 'Set the default label for conversations for logged in clients.<br /> The Label must already be present in your Chatwoot Dashboard > Labels',
+            ],
+            'chatwoot_enableonadmin'    => [
+                'FriendlyName' => 'Enable on Login as Client',
+                'Type'         => 'yesno',
+                'Size'         => '55',
+                'Default'      => 'no',
+                'Description'  => 'check this box to enable the chat box when admin is logged in as client (not recommended, as it may mess up real users\' sessions, so enable this option only for debugging purposes and make sure to logout of the user account to trigger session reset.',
             ],
         ),
     );
