@@ -31,17 +31,9 @@ if (!Capsule::schema()->hasTable('mod_chatwoot')) {
     } catch (\Exception $e) {
         return [
             "status"      => "error",
-            "description" => "There was an error activating AutoCredit for WHMCS - Unable to create mod_chatwoot table: {$e->getMessage()}",
+            "description" => "There was an error activating Chatwoot for WHMCS - Unable to create mod_chatwoot table: {$e->getMessage()}",
         ];
-        logActivity("AutoCredit: there was an error activating the addon - Unable to create mod_chatwoot table: {$e->getMessage()}");
-    }
-}
-
-if (!Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->first()) {
-    try {
-        Capsule::table('mod_chatwoot')->insert(['setting' => 'signing_hash', 'value' => 'jio23urfhjxo28ku2so90uso9u8sn']);
-    } catch (\Exception $e) {
-        return ["status" => "error", "description" => "There was an error activating Chatwoot for WHMCS - Unable to create mod_chatwoot table: {$e->getMessage()}"];
+        logActivity("Chatwoot: there was an error activating the addon - Unable to create mod_chatwoot table: {$e->getMessage()}");
     }
 }
 
