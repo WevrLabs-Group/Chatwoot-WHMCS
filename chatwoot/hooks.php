@@ -179,6 +179,7 @@ function hook_chatwoot_output($vars)
                 window.chatwootSettings = {
                   position: '$chatwoot_position',
                   locale: '$chatwoot_lang',
+                  type: '$chatwoot_bubble',
                 }
               });
             </script>";
@@ -191,6 +192,7 @@ function hook_chatwoot_output($vars)
                 window.chatwootSettings = {
                   position: '$chatwoot_position',
                   locale: '$chatwoot_lang',
+                  type: '$chatwoot_bubble',
                 };
                 window.\$chatwoot.setCustomAttributes({
                   'IP Address': '$ip',
@@ -248,14 +250,17 @@ function cwoot_whmcs_version()
 
 $LogoutHook = ($whmcsver > 7) ? 'UserLogout' : 'ClientLogout';
 
+add_hook('ClientAreaFooterOutput', 1, 'hook_chatwoot_output');
+add_hook($LogoutHook, 1, 'hook_chatwoot_logout_output');
+
+# meta
+
 function getOS()
 {
 
-    $user_agent = $_SERVER['HTTP_USER_AGENT'];
-
+    $user_agent  = $_SERVER['HTTP_USER_AGENT'];
     $os_platform = "Unknown OS Platform";
-
-    $os_array = array(
+    $os_array    = array(
         '/windows nt 6.3/i'     => 'Windows 8.1',
         '/windows nt 6.2/i'     => 'Windows 8',
         '/windows nt 6.1/i'     => 'Windows 7',
@@ -281,24 +286,18 @@ function getOS()
     );
 
     foreach ($os_array as $regex => $value) {
-
         if (preg_match($regex, $user_agent)) {
             $os_platform = $value;
         }
-
     }
-
     return $os_platform;
-
 }
 
 function getBrowser()
 {
 
-    $user_agent = $_SERVER['HTTP_USER_AGENT'];
-
-    $browser = "Unknown Browser";
-
+    $user_agent    = $_SERVER['HTTP_USER_AGENT'];
+    $browser       = "Unknown Browser";
     $browser_array = array(
         '/msie/i'      => 'Internet Explorer',
         '/firefox/i'   => 'Firefox',
@@ -312,16 +311,9 @@ function getBrowser()
     );
 
     foreach ($browser_array as $regex => $value) {
-
         if (preg_match($regex, $user_agent)) {
             $browser = $value;
         }
-
     }
-
     return $browser;
-
 }
-
-add_hook('ClientAreaFooterOutput', 1, 'hook_chatwoot_output');
-add_hook($LogoutHook, 1, 'hook_chatwoot_logout_output');
