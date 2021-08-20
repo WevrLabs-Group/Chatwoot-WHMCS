@@ -174,8 +174,8 @@ function hook_chatwoot_output($vars)
                   'User Browser': '$user_browser',
                   'User System': '$user_os',
                 });
-                window.\$chatwoot.setLabel('$chatwoot_label')
                 window.\$chatwoot.deleteCustomAttribute('Test Attribute')
+                window.\$chatwoot.setLabel('$chatwoot_label')
                 window.chatwootSettings = {
                   position: '$chatwoot_position',
                   locale: '$chatwoot_lang',
