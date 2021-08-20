@@ -47,7 +47,7 @@ function chatwoot_config()
         "name"        => "Chatwoot",
         "description" => "Chatwoot is a customer support tool for instant messaging channels which can help businesses to provide exceptional customer support. WHMCS module contributed by: <a href='https://wevrlabs.net/?utm_source=addon_link' target='_blank'>WevrLabs Hosting</a>",
         "version"     => "2.0.0",
-        "author"      => "<a href='https://github.com/WevrLabs-Group/Chatwoot-WHMCS' target='_blank'><img alt='' width='100px' src='' /><br />contributed by WevrLabs Hosting</a>",
+        "author"      => "<a href='https://github.com/WevrLabs-Group/Chatwoot-WHMCS' target='_blank'><img alt='' width='100px' src='https://camo.githubusercontent.com/778ffdc9c0cb0bf52e04ffc22f3d392f028ceedc0f60c0e74741aac7c4375eb4/68747470733a2f2f73332e75732d776573742d322e616d617a6f6e6177732e636f6d2f67682d6173736574732e63686174776f6f742e636f6d2f6272616e642e737667' /><br />contributed by WevrLabs Hosting</a>",
         "fields"      => array(
             'chatwoot_enable'           => [
                 'FriendlyName' => 'Enable Chatwoot',
