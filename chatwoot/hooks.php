@@ -172,6 +172,9 @@ function hook_chatwoot_output($vars)
                   'Email Status': '$clientemailver',
                   'Is Affiliate': '$clientaffiliate',
                   'IP Address': '$ip',
+                  'Current Page': '$currentpage',
+                  'User Browser': '$user_browser',
+                  'User System': '$user_os',
                 });
                 window.\$chatwoot.setLabel('$chatwoot_label')
                 window.\$chatwoot.deleteCustomAttribute('Test Attribute')
@@ -195,6 +198,9 @@ function hook_chatwoot_output($vars)
                 };
                 window.\$chatwoot.setCustomAttributes({
                   'IP Address': '$ip',
+                  'Current Page': '$currentpage',
+                  'User Browser': '$user_browser',
+                  'User System': '$user_os',
                 });
               });
             </script>";
@@ -213,7 +219,7 @@ function hook_chatwoot_logout_output($vars)
     echo $chatwoot_logoutJS;
 }
 
-$whmcsver = whmcs_version();
+$whmcsver = cwoot_whmcs_version();
 
 # for WHMCS 8 and later
 if ($whmcsver > 7) {
@@ -236,7 +242,7 @@ if ($whmcsver > 7) {
     });
 }
 
-function whmcs_version()
+function cwoot_whmcs_version()
 {
     $whmcsversion = Capsule::table('tblconfiguration')->where('setting', 'Version')->value('value');
     $whmcsver     = substr($whmcsversion, 0, 1);
