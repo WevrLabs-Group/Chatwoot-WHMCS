@@ -5,7 +5,7 @@
 // * Chatwoot WHMCS Addon (v2.0.0).                                        *
 // * This addon modules enables you integrate Chatwoot with your WHMCS     *
 //   and leverage its powerful features.                                   *
-// * Tested on WHMCS Version: 7.10.3                                       *
+// * Tested on WHMCS Version: 7.10.3 up to v8.2.0                          *
 // * For assistance on how to use and setup Chatwoot, visit                *
 //   https://www.chatwoot.com/docs/channels/website                        *
 // *                                                                       *
@@ -21,14 +21,20 @@ if (!defined("WHMCS")) {
     die("This file cannot be accessed directly");
 }
 
+use WHMCS\Authentication\CurrentUser;
 use WHMCS\Database\Capsule;
 
 function hook_chatwoot_output($vars)
 {
+
+    # ignore if admin
     if (isset($_SESSION['adminid'])) {
-        return;
+        //return;
     }
+
     $chatwoot_jscode = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_jscode')->value('value');
+
+    $signing_hash = Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->value('value');
 
     $verification_hash = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
 
@@ -39,42 +45,48 @@ function hook_chatwoot_output($vars)
 
     $isenabled = Capsule::table('tbladdonmodules')->select('value')->where('module', '=', 'chatwoot')->where('setting', '=', 'chatwoot_enable')->where('value', 'on')->count();
 
-    // Disable or Enable Chatwoot
+    # Disable or Enable Chatwoot
     if (empty($isenabled)) {
         return;
     }
 
-    $client = Menu::context('client');
+    $client = CurrentUser::client(); //Menu::context('client');
+    $user   = CurrentUser::user();
 
-    $ipaddress = $_SERVER['REMOTE_ADDR'];
-    $ip        = gethostbyaddr($ipaddress);
+    $ipaddress   = $_SERVER['REMOTE_ADDR'];
+    $ip          = gethostbyaddr($ipaddress);
+    $currentpage = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
-    // Fetch labels
-    if (!is_null($client)) {
+    $user_os      = getOS();
+    $user_browser = getBrowser();
+
+    # Fetch labels
+    if ($user && $user->isOwner(CurrentUser::client())) {
         $chatwoot_label = $chatwoot_setlabelloggedin;
     }
 
-    // Get client ID and set chat ID
-    if (!is_null($client)) {
-        if ($vars['clientsdetails']['id']) {
-            $ClientID = $vars['clientsdetails']['id'];
-        }
+    # Get client ID and set chat ID
+    if ($user && $user->isOwner(CurrentUser::client())) {
+        $ClientID = $client->id; //$vars['clientsdetails']['id'];
+    } elseif ($user) {
+        $ownedClients = $user->ownedClients()->all();
+        $ClientID     = $ownedClients[0]['id'];
     }
 
     if (!is_null($client)) {
-        $ClientChatID    = hash_hmac("sha256", $ClientID, "nQ1ayoG5bu580LZkSxMJiO2");
+        $ClientChatID    = hash_hmac("sha256", $ClientID, $signing_hash);
         $identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
     }
 
-    // getting Client Info
+    # getting Client Info
     if (!is_null($client)) {
 
         $apiPostData = array('clientid' => $ClientID, 'stats' => true);
-        $apiResults  = localAPI(GetClientsDetails, $apiPostData);
+        $apiResults  = localAPI('GetClientsDetails', $apiPostData);
 
-        // Client Info
+        # Client Info
         $clientemail    = $apiResults['client']['email'];
-        $clientname     = $apiResults['client']['fullname'];
+        $clientname     = '#' . $ClientID . ' - ' . $apiResults['client']['fullname'];
         $clientphone    = $apiResults['client']['phonenumberformatted'];
         $clientcompany  = $apiResults['client']['companyname'];
         $clientcountry  = $apiResults['client']['countryname'];
@@ -83,26 +95,25 @@ function hook_chatwoot_output($vars)
         $clientpostcode = $apiResults['client']['postcode'];
         $clientlang     = $apiResults['client']['language'];
 
-        // Extra Meta
+        # Extra Meta
         $clienttickets = $apiResults['stats']['numactivetickets'];
         $clientcredit  = $apiResults['stats']['creditbalance'];
         $clientrevenue = $apiResults['stats']['income'];
         $clientunpaid  = $apiResults['stats']['numunpaidinvoices'];
-        // $clientunpaidtotal = $apiResults['stats']['unpaidinvoicesamount'];
+        # $clientunpaidtotal = $apiResults['stats']['unpaidinvoicesamount'];
         $clientoverdue = $apiResults['stats']['numoverdueinvoices'];
-        // $clientoverduetotal = $apiResults['stats']['overdueinvoicesbalance'];
+        # $clientoverduetotal = $apiResults['stats']['overdueinvoicesbalance'];
         $isClientAffiliate = $apiResults["stats"]["isAffiliate"];
         $clientemailstatus = $apiResults["email_verified"];
-        $customfieldvalue  = Capsule::table("tblcustomfieldsvalues")->where("fieldid", 236)->where("relid", $ClientID)->value('value');
 
-        // Is Email Verified?
+        # Is Email Verified?
         if ($clientemailstatus == true) {
             $clientemailver = 'Verified';
         } else {
             $clientemailver = 'Not Verified';
         }
 
-        // Is Client an Affiliate?
+        # Is Client an Affiliate?
         if ($isClientAffiliate == 1) {
             $clientaffiliate = 'Yes';
         } else {
@@ -110,91 +121,85 @@ function hook_chatwoot_output($vars)
         }
     }
 
-    // Now let's prepare our code for final output
+    # Now let's prepare our code for final output
 
     if (!is_null($client)) {
 
-        $chatwoot_output = "
-            <!-- Chatwoot JS Code -->
-                $chatwoot_jscode
-            <!-- --- -->
-            <!-- Chatwoot Begin Meta Code -->
+        $chatwoot_output =
+            "$chatwoot_jscode
             <script>
-                window.addEventListener('chatwoot:ready', function () {
-                    window.\$chatwoot.setUser('$ClientChatID', {
-                        email: '$clientemail',
-                        name: '$clientname',
-                        identifier_hash: '$identifier_hash'
-                    });
-                    window.\$chatwoot.setCustomAttributes({
-                        ID: '$ClientID',
-                        Phone: '$clientphone',
-                        Language: '$clientlang',
-                        City: '$clientcity',
-                        State: '$clientstate',
-                        'Post Code': '$clientpostcode',
-                        Country: '$clientcountry',
-                        Company: '$clientcompany',
-                        'Active Tickets': '$clienttickets',
-                        'Credit Balance': '$clientcredit',
-                        'Revenue': '$clientrevenue',
-                        'Unpaid Invoices': '$clientunpaid',
-                        'Account Unpaid': '$clientunpaidtotal',
-                        'Overdue Invoices': '$clientoverdue',
-                        'Account Overdue': '$clientoverduetotal',
-                        'Email Status': '$clientemailver',
-                        'Is Affiliate': '$clientaffiliate',
-                        'IP Address': '$ip',
-						'Customer Number': '$customfieldvalue',
-                    });
-                    window.\$chatwoot.setLabel('$chatwoot_label')
-                    window.\$chatwoot.deleteCustomAttribute('Test Attribute')
-                    window.chatwootSettings = {
-                        position: '$chatwoot_position',
-                        locale: '$chatwoot_lang',
-                    }
+              window.addEventListener('chatwoot:ready', function () {
+                window.\$chatwoot.setUser('$ClientChatID', {
+                  email: '$clientemail',
+                  name: '$clientname',
+                  identifier_hash: '$identifier_hash'
                 });
-            </script>
-            <!-- Chatwoot End Meta Code -->";
+                window.\$chatwoot.setCustomAttributes({
+                  ID: '$ClientID',
+                  Phone: '$clientphone',
+                  Language: '$clientlang',
+                  City: '$clientcity',
+                  State: '$clientstate',
+                  'Post Code': '$clientpostcode',
+                  Country: '$clientcountry',
+                  Company: '$clientcompany',
+                  'Active Tickets': '$clienttickets',
+                  'Credit Balance': '$clientcredit',
+                  'Revenue': '$clientrevenue',
+                  'Unpaid Invoices': '$clientunpaid',
+                  'Account Unpaid': '$clientunpaidtotal',
+                  'Overdue Invoices': '$clientoverdue',
+                  'Account Overdue': '$clientoverduetotal',
+                  'Email Status': '$clientemailver',
+                  'Is Affiliate': '$clientaffiliate',
+                  'IP Address': '$ip',
+                  'Current Page': '$currentpage',
+                  'User Browser': '$user_browser',
+                  'User System': '$user_os',
+                });
+                window.\$chatwoot.setLabel('$chatwoot_label')
+                window.\$chatwoot.deleteCustomAttribute('Test Attribute')
+                window.chatwootSettings = {
+                  position: '$chatwoot_position',
+                  locale: '$chatwoot_lang',
+                }
+              });
+            </script>";
     } else {
         $chatwoot_output = "
-                <!-- Chatwoot JS Code -->
-                $chatwoot_jscode
-                <!-- --- -->
-                <!-- Chatwoot Begin Meta Code -->
-                <script>
-                    window.addEventListener('chatwoot:ready', function () {
-                        window.\$chatwoot.setLabel('$chatwoot_label')
-                        window.chatwootSettings = {
-                            position: '$chatwoot_position',
-                            locale: '$chatwoot_lang',
-                        };
-
-                        window.\$chatwoot.setCustomAttributes({
-                            'IP Address': '$ip',
-                        });
-                    });
-                </script>
-                <!-- Chatwoot End Meta Code -->";
+            $chatwoot_jscode
+            <script>
+              window.addEventListener('chatwoot:ready', function () {
+                window.\$chatwoot.setLabel('$chatwoot_label')
+                window.chatwootSettings = {
+                  position: '$chatwoot_position',
+                  locale: '$chatwoot_lang',
+                };
+                window.\$chatwoot.setCustomAttributes({
+                  'IP Address': '$ip',
+                  'Current Page': '$currentpage',
+                  'User Browser': '$user_browser',
+                  'User System': '$user_os',
+                });
+              });
+            </script>";
     }
-
+    //logActivity("[CW Debug]: "print_r($vars, true) , $ClientID);
     return $chatwoot_output;
-
 }
 
 function hook_chatwoot_logout_output($vars)
 {
-    $chatwoot_logoutJS = "<!-- Chatwoot Logout Code -->
-            <script>
-                document.addEventListener('readystatechange', event => {
-                    window.\$chatwoot.reset()
-                });
-            </script>
-            <!-- Chatwoot End Logout Code -->";
+    $chatwoot_logoutJS = "
+        <script>
+          document.addEventListener('readystatechange', event => {
+            window.\$chatwoot.reset()
+          });
+        </script>";
     echo $chatwoot_logoutJS;
 }
 
-$whmcsver = whmcs_version();
+$whmcsver = cwoot_whmcs_version();
 
 # for WHMCS 8 and later
 if ($whmcsver > 7) {
@@ -217,7 +222,7 @@ if ($whmcsver > 7) {
     });
 }
 
-function whmcs_version()
+function cwoot_whmcs_version()
 {
     $whmcsversion = Capsule::table('tblconfiguration')->where('setting', 'Version')->value('value');
     $whmcsver     = substr($whmcsversion, 0, 1);
@@ -225,6 +230,81 @@ function whmcs_version()
 }
 
 $LogoutHook = ($whmcsver > 7) ? 'UserLogout' : 'ClientLogout';
+
+function getOS()
+{
+
+    $user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+    $os_platform = "Unknown OS Platform";
+
+    $os_array = array(
+        '/windows nt 6.3/i'     => 'Windows 8.1',
+        '/windows nt 6.2/i'     => 'Windows 8',
+        '/windows nt 6.1/i'     => 'Windows 7',
+        '/windows nt 6.0/i'     => 'Windows Vista',
+        '/windows nt 5.2/i'     => 'Windows Server 2003/XP x64',
+        '/windows nt 5.1/i'     => 'Windows XP',
+        '/windows xp/i'         => 'Windows XP',
+        '/windows nt 5.0/i'     => 'Windows 2000',
+        '/windows me/i'         => 'Windows ME',
+        '/win98/i'              => 'Windows 98',
+        '/win95/i'              => 'Windows 95',
+        '/win16/i'              => 'Windows 3.11',
+        '/macintosh|mac os x/i' => 'Mac OS X',
+        '/mac_powerpc/i'        => 'Mac OS 9',
+        '/linux/i'              => 'Linux',
+        '/ubuntu/i'             => 'Ubuntu',
+        '/iphone/i'             => 'iPhone',
+        '/ipod/i'               => 'iPod',
+        '/ipad/i'               => 'iPad',
+        '/android/i'            => 'Android',
+        '/blackberry/i'         => 'BlackBerry',
+        '/webos/i'              => 'Mobile',
+    );
+
+    foreach ($os_array as $regex => $value) {
+
+        if (preg_match($regex, $user_agent)) {
+            $os_platform = $value;
+        }
+
+    }
+
+    return $os_platform;
+
+}
+
+function getBrowser()
+{
+
+    $user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+    $browser = "Unknown Browser";
+
+    $browser_array = array(
+        '/msie/i'      => 'Internet Explorer',
+        '/firefox/i'   => 'Firefox',
+        '/safari/i'    => 'Safari',
+        '/chrome/i'    => 'Chrome',
+        '/opera/i'     => 'Opera',
+        '/netscape/i'  => 'Netscape',
+        '/maxthon/i'   => 'Maxthon',
+        '/konqueror/i' => 'Konqueror',
+        '/mobile/i'    => 'Handheld Browser',
+    );
+
+    foreach ($browser_array as $regex => $value) {
+
+        if (preg_match($regex, $user_agent)) {
+            $browser = $value;
+        }
+
+    }
+
+    return $browser;
+
+}
 
 add_hook('ClientAreaFooterOutput', 1, 'hook_chatwoot_output');
 add_hook($LogoutHook, 1, 'hook_chatwoot_logout_output');
