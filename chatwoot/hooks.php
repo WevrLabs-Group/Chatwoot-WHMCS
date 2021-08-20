@@ -67,7 +67,7 @@ function hook_chatwoot_output($vars)
 
     # widget lang
     if ($chatwoot_lang_setting) {
-        $chatwoot_lang = langCode(ucfirst($vars['language']));
+        $chatwoot_lang = cw_langCode(ucfirst($vars['language']));
     }
 
     # user basic info
@@ -320,7 +320,7 @@ function getBrowser()
 }
 
 # to deal with langs
-function langCode($name)
+function cw_langCode($name)
 {
     $languageCodes = array(
         "aa" => "Afar",
