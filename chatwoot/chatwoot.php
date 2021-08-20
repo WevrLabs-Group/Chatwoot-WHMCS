@@ -5,7 +5,7 @@
 // * Chatwoot WHMCS Addon (v2.0.0).                                        *
 // * This addon modules enables you integrate Chatwoot with your WHMCS     *
 //   and leverage its powerful features.                                   *
-// * Tested on WHMCS Version: 7.10.3                                       *
+// * Tested on WHMCS Version: v8.2.1                                       *
 // * For assistance on how to use and setup Chatwoot, visit                *
 //   https://www.chatwoot.com/docs/channels/website                        *
 // *                                                                       *
@@ -16,6 +16,30 @@
 // * Website: https://wevrlabs.net                                         *
 // *                                                                       *
 // *************************************************************************/
+
+use WHMCS\Database\Capsule;
+
+if (!Capsule::schema()->hasTable('mod_chatwoot')) {
+    try {
+        Capsule::schema()->create(
+            'mod_chatwoot', function ($table) {
+                $table->increments('id')->unique();
+                $table->string('setting', 100)->unique();
+                $table->string('value', 55250)->nullable();
+            }
+        );
+    } catch (\Exception $e) {
+        return [
+            "status"      => "error",
+            "description" => "There was an error activating Chatwoot for WHMCS - Unable to create mod_chatwoot table: {$e->getMessage()}",
+        ];
+        logActivity("Chatwoot: there was an error activating the addon - Unable to create mod_chatwoot table: {$e->getMessage()}");
+    }
+}
+
+if (!Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->first()) {
+    Capsule::table('mod_chatwoot')->insert(['setting' => 'signing_hash', 'value' => 'nQ1ayoG5bu580LZkSxMJiO2']);
+}
 
 function chatwoot_config()
 {
@@ -72,4 +96,19 @@ function chatwoot_config()
     );
 
     return $configarray;
+}
+
+function chatwoot_activate()
+{
+
+    if (!Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->first()) {
+        try {
+            Capsule::table('mod_chatwoot')->insert(['setting' => 'signing_hash', 'value' => 'nQ1ayoG5bu580LZkSxMJiO2']);
+        } catch (\Exception $e) {
+            return ["status" => "error", "description" => "There was an error activating Chatwoot for WHMCS - Unable to create mod_chatwoot table: {$e->getMessage()}"];
+        }
+    }
+
+    return ['status' => 'success', 'description' => "Chatwoot for WHMCS has been successfully activated! Don't forget to configure the settings below!"];
+
 }
