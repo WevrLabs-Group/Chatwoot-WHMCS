@@ -62,14 +62,14 @@ function chatwoot_config()
                 'Rows'         => '15',
                 'Cols'         => '100',
                 'Default'      => '',
-                'Description'  => 'Paste your website widget JS code in this field. You can obtain it from your Chatwoot Dashboard > Inboxes > Website > Settings.<br /> For help, visit <a href="https://github.com/WevrLabs-Group/Chatwoot-WHMCS" target="_blank">https://github.com/WevrLabs-Group/Chatwoot-WHMCS</a>',
+                'Description'  => 'Paste your website widget JS code in this field. You can obtain it from your Chatwoot Dashboard > Inboxes > Website > Settings.<br /> For help, visit <a href="https://www.chatwoot.com/docs/product/channels/live-chat/create-website-channel" target="_blank">Chatwoot Docs</a>',
             ],
             'chatwoot_verhash'          => [
-                'FriendlyName' => 'Verification Hash',
+                'FriendlyName' => 'Verification Hash (Required)',
                 'Type'         => 'text',
                 'Size'         => '',
                 'Default'      => '',
-                'Description'  => 'To make sure the conversations between the customers and the support agents are private and to disallow impersonation, you can setup identity validation Chatwoot. <br />The key used to generate HMAC for each webwidget is different and can be copied from Inboxes -> Settings -> Configuration -> Identity Validation -> Copy the token shown there',
+                'Description'  => 'To make sure the conversations between the customers and the support agents are private and to disallow impersonation, you can setup identity validation in Chatwoot. <br />The key used to generate HMAC hash is unique for each webwidget and you can copy it from Inboxes -> Website Settings -> Configuration -> Identity Validation -> Copy the token shown there<br />To learn more about this, visit <a href="https://www.chatwoot.com/docs/product/channels/live-chat/sdk/identity-validation" target="_blank">Chatwoot Docs</a>',
             ],
             'chatwoot_position'         => [
                 'FriendlyName' => 'Chat Box Position',
@@ -77,6 +77,20 @@ function chatwoot_config()
                 'Options'      => 'right,left',
                 'Default'      => 'right',
                 'Description'  => 'Set your chat box position, whether to be left or right in the page.',
+            ],
+            'chatwoot_bubble'           => [
+                'FriendlyName' => 'Chat Box Bubble',
+                'Type'         => 'radio',
+                'Options'      => 'Standard,Expanded Bubble',
+                'Default'      => 'Standard',
+                'Description'  => 'Set the chat box bubble design. Read more at <a href="https://www.chatwoot.com/docs/product/channels/live-chat/sdk/setup#widget-designs" target="_blank">Chatwoot Docs</a>.',
+            ],
+            'chatwoot_lang'             => [
+                'FriendlyName' => 'Dynamic Language',
+                'Type'         => 'yesno',
+                'Size'         => '55',
+                'Default'      => 'no',
+                'Description'  => 'check this box to set the chat box language according to current WHMCS clientarea langauge preference.',
             ],
             'chatwoot_setlabel'         => [
                 'FriendlyName' => 'Default non-logged In Conversation Label',
@@ -91,6 +105,13 @@ function chatwoot_config()
                 'Size'         => '15',
                 'Default'      => '',
                 'Description'  => 'Set the default label for conversations for logged in clients.<br /> The Label must already be present in your Chatwoot Dashboard > Labels',
+            ],
+            'chatwoot_enableonadmin'    => [
+                'FriendlyName' => 'Enable on Login as Client',
+                'Type'         => 'yesno',
+                'Size'         => '55',
+                'Default'      => 'no',
+                'Description'  => 'check this box to enable the chat box when admin is logged in as client (not recommended, as it may mess up real users\' sessions, so enable this option only for debugging purposes and make sure to logout of the user account to trigger session reset.',
             ],
         ),
     );
