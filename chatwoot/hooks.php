@@ -50,13 +50,12 @@ function hook_chatwoot_output($vars)
         return;
     }
 
-    $client = CurrentUser::client(); //Menu::context('client');
-    $user   = CurrentUser::user();
-
-    $ipaddress   = $_SERVER['REMOTE_ADDR'];
-    $ip          = gethostbyaddr($ipaddress);
-    $currentpage = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-
+    # user basic info
+    $client       = CurrentUser::client(); //Menu::context('client');
+    $user         = CurrentUser::user();
+    $ipaddress    = $_SERVER['REMOTE_ADDR'];
+    $ip           = gethostbyaddr($ipaddress);
+    $currentpage  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
     $user_os      = getOS();
     $user_browser = getBrowser();
 
