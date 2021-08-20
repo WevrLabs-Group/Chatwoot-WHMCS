@@ -5,7 +5,7 @@
 // * Chatwoot WHMCS Addon (v2.0.0).                                        *
 // * This addon modules enables you integrate Chatwoot with your WHMCS     *
 //   and leverage its powerful features.                                   *
-// * Tested on WHMCS Version: 7.10.3 up to v8.2.0                          *
+// * Tested on WHMCS Version: v8.2.1                                       *
 // * For assistance on how to use and setup Chatwoot, visit                *
 //   https://www.chatwoot.com/docs/channels/website                        *
 // *                                                                       *
@@ -21,6 +21,7 @@ if (!defined("WHMCS")) {
     die("This file cannot be accessed directly");
 }
 
+use WHMCS\Authentication\CurrentUser;
 use WHMCS\Database\Capsule;
 
 function hook_chatwoot_output($vars)
@@ -69,10 +70,14 @@ function hook_chatwoot_output($vars)
         $chatwoot_lang = langCode(ucfirst($vars['language']));
     }
 
-    $client = Menu::context('client');
-
-    $ipaddress = $_SERVER['REMOTE_ADDR'];
-    $ip        = gethostbyaddr($ipaddress);
+    # user basic info
+    $client       = CurrentUser::client(); //Menu::context('client');
+    $user         = CurrentUser::user();
+    $ipaddress    = $_SERVER['REMOTE_ADDR'];
+    $ip           = gethostbyaddr($ipaddress);
+    $currentpage  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+    $user_os      = getOS();
+    $user_browser = getBrowser(); = gethostbyaddr($ipaddress);
 
     # Fetch labels
     if (!is_null($client)) {
@@ -80,10 +85,11 @@ function hook_chatwoot_output($vars)
     }
 
     # Get client ID and set chat ID
-    if (!is_null($client)) {
-        if ($vars['clientsdetails']['id']) {
-            $ClientID = $vars['clientsdetails']['id'];
-        }
+    if ($user && $user->isOwner(CurrentUser::client())) {
+        $ClientID = $client->id; //$vars['clientsdetails']['id'];
+    } elseif ($user) {
+        $ownedClients = $user->ownedClients()->all();
+        $ClientID     = $ownedClients[0]['id'];
     }
 
     if (!is_null($client)) {
@@ -241,6 +247,71 @@ $LogoutHook = ($whmcsver > 7) ? 'UserLogout' : 'ClientLogout';
 
 add_hook('ClientAreaFooterOutput', 1, 'hook_chatwoot_output');
 add_hook($LogoutHook, 1, 'hook_chatwoot_logout_output');
+
+# meta
+
+function getOS()
+{
+
+    $user_agent  = $_SERVER['HTTP_USER_AGENT'];
+    $os_platform = "Unknown OS Platform";
+    $os_array    = array(
+        '/windows nt 6.3/i'     => 'Windows 8.1',
+        '/windows nt 6.2/i'     => 'Windows 8',
+        '/windows nt 6.1/i'     => 'Windows 7',
+        '/windows nt 6.0/i'     => 'Windows Vista',
+        '/windows nt 5.2/i'     => 'Windows Server 2003/XP x64',
+        '/windows nt 5.1/i'     => 'Windows XP',
+        '/windows xp/i'         => 'Windows XP',
+        '/windows nt 5.0/i'     => 'Windows 2000',
+        '/windows me/i'         => 'Windows ME',
+        '/win98/i'              => 'Windows 98',
+        '/win95/i'              => 'Windows 95',
+        '/win16/i'              => 'Windows 3.11',
+        '/macintosh|mac os x/i' => 'Mac OS X',
+        '/mac_powerpc/i'        => 'Mac OS 9',
+        '/linux/i'              => 'Linux',
+        '/ubuntu/i'             => 'Ubuntu',
+        '/iphone/i'             => 'iPhone',
+        '/ipod/i'               => 'iPod',
+        '/ipad/i'               => 'iPad',
+        '/android/i'            => 'Android',
+        '/blackberry/i'         => 'BlackBerry',
+        '/webos/i'              => 'Mobile',
+    );
+
+    foreach ($os_array as $regex => $value) {
+        if (preg_match($regex, $user_agent)) {
+            $os_platform = $value;
+        }
+    }
+    return $os_platform;
+}
+
+function getBrowser()
+{
+
+    $user_agent    = $_SERVER['HTTP_USER_AGENT'];
+    $browser       = "Unknown Browser";
+    $browser_array = array(
+        '/msie/i'      => 'Internet Explorer',
+        '/firefox/i'   => 'Firefox',
+        '/safari/i'    => 'Safari',
+        '/chrome/i'    => 'Chrome',
+        '/opera/i'     => 'Opera',
+        '/netscape/i'  => 'Netscape',
+        '/maxthon/i'   => 'Maxthon',
+        '/konqueror/i' => 'Konqueror',
+        '/mobile/i'    => 'Handheld Browser',
+    );
+
+    foreach ($browser_array as $regex => $value) {
+        if (preg_match($regex, $user_agent)) {
+            $browser = $value;
+        }
+    }
+    return $browser;
+}
 
 # to deal with langs
 function langCode($name)
