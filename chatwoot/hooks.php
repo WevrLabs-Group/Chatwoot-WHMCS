@@ -56,6 +56,18 @@ function hook_chatwoot_output($vars)
         return;
     }
 
+    # bubble design
+    if ($chatwoot_bubble == 'Standard') {
+        $chatwoot_bubble = 'standard';
+    } elseif ($chatwoot_bubble == 'Expanded Bubble') {
+        $chatwoot_bubble = 'expanded_bubble';
+    }
+
+    # widget lang
+    if ($chatwoot_lang_setting) {
+        $chatwoot_lang = langCode(ucfirst($vars['language']));
+    }
+
     # user basic info
     $client       = CurrentUser::client(); //Menu::context('client');
     $user         = CurrentUser::user();
@@ -66,7 +78,7 @@ function hook_chatwoot_output($vars)
     $user_browser = getBrowser();
 
     # Fetch labels
-    if ($user && $user->isOwner(CurrentUser::client())) {
+    if (!is_null($client)) {
         $chatwoot_label = $chatwoot_setlabelloggedin;
     }
 
