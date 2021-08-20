@@ -29,7 +29,7 @@ function hook_chatwoot_output($vars)
 
     # ignore if admin
     if (isset($_SESSION['adminid'])) {
-        //return;
+        return;
     }
 
     $chatwoot_jscode = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_jscode')->value('value');
