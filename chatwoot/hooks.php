@@ -49,7 +49,7 @@ function hook_chatwoot_output($vars)
 
     $chatwoot_admin = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_enableonadmin')->value('value');
 
-    $isenabled = Capsule::table('tbladdonmodules')->select('value')->where('module', '=', 'chatwoot')->where('setting', '=', 'chatwoot_enable')->where('value', 'on')->count();
+    $signing_hash = Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->value('value');
 
     # Disable or Enable Chatwoot
     if (empty($isenabled)) {
