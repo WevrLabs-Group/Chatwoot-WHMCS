@@ -176,11 +176,11 @@ function hook_chatwoot_output($vars)
                   'User Browser': '$user_browser',
                   'User System': '$user_os',
                 });
-                window.\$chatwoot.setLabel('$chatwoot_label')
                 window.\$chatwoot.deleteCustomAttribute('Test Attribute')
+                window.\$chatwoot.setLabel('$chatwoot_label')
+                window.\$chatwoot.setLocale('$chatwoot_lang')
                 window.chatwootSettings = {
                   position: '$chatwoot_position',
-                  locale: '$chatwoot_lang',
                   type: '$chatwoot_bubble',
                 }
               });
@@ -191,9 +191,9 @@ function hook_chatwoot_output($vars)
             <script>
               window.addEventListener('chatwoot:ready', function () {
                 window.\$chatwoot.setLabel('$chatwoot_label')
+                window.\$chatwoot.setLocale('$chatwoot_lang')
                 window.chatwootSettings = {
                   position: '$chatwoot_position',
-                  locale: '$chatwoot_lang',
                   type: '$chatwoot_bubble',
                 };
                 window.\$chatwoot.setCustomAttributes({
