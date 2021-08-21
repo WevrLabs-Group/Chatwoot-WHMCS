@@ -78,25 +78,25 @@ function hook_chatwoot_output($vars)
     $user_browser = getBrowser();
 
     # Fetch labels
-    if (!is_null($client)) {
+    if (!is_null($user)) {
         $chatwoot_label = $chatwoot_setlabelloggedin;
     }
 
-    # Get client ID and set chat ID
-    if ($user && $user->isOwner(CurrentUser::client())) {
+    # Get contact ID and set chat ID
+    if ($user && $client && $user->isOwner($client)) {
         $ClientID = $client->id; //$vars['clientsdetails']['id'];
     } elseif ($user) {
         $ownedClients = $user->ownedClients()->all();
         $ClientID     = $ownedClients[0]['id'];
     }
 
-    if (!is_null($client)) {
+    if (!is_null($user)) {
         $ClientChatID    = hash_hmac("sha256", $ClientID, $signing_hash);
         $identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
     }
 
-    # getting Client Info
-    if (!is_null($client)) {
+    # build contact Info
+    if (!is_null($user)) {
 
         $apiPostData = array('clientid' => $ClientID, 'stats' => true);
         $apiResults  = localAPI('GetClientsDetails', $apiPostData);
@@ -140,7 +140,7 @@ function hook_chatwoot_output($vars)
 
     # Now let's prepare our code for final output
 
-    if (!is_null($client)) {
+    if (!is_null($user)) {
 
         $chatwoot_output =
             "$chatwoot_jscode
