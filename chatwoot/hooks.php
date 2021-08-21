@@ -117,11 +117,13 @@ function hook_chatwoot_output($vars)
         $clientcredit  = $apiResults['stats']['creditbalance'];
         $clientrevenue = $apiResults['stats']['income'];
         $clientunpaid  = $apiResults['stats']['numunpaidinvoices'];
-        # $clientunpaidtotal = $apiResults['stats']['unpaidinvoicesamount'];
+        $clientunpaidtotal = $apiResults['stats']['unpaidinvoicesamount'];
         $clientoverdue = $apiResults['stats']['numoverdueinvoices'];
         # $clientoverduetotal = $apiResults['stats']['overdueinvoicesbalance'];
         $isClientAffiliate = $apiResults["stats"]["isAffiliate"];
         $clientemailstatus = $apiResults["email_verified"];
+        $customfieldvalue  = Capsule::table("tblcustomfieldsvalues")->where("fieldid", 236)->where("relid", $ClientID)->value('value');
+
 
         # Is Email Verified?
         if ($clientemailstatus == true) {
@@ -169,6 +171,7 @@ function hook_chatwoot_output($vars)
                   'Account Overdue': '$clientoverduetotal',
                   'Email Status': '$clientemailver',
                   'Is Affiliate': '$clientaffiliate',
+                  'Customer Number': '$customfieldvalue',
                   'IP Address': '$ip',
                   'Current Page': '$currentpage',
                   'User Browser': '$user_browser',
