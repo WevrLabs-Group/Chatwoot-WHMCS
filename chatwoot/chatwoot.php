@@ -17,6 +17,10 @@
 // *                                                                       *
 // *************************************************************************/
 
+if (!defined("WHMCS")) {
+    die("This file cannot be accessed directly");
+}
+
 use WHMCS\Database\Capsule;
 
 if (!Capsule::schema()->hasTable('mod_chatwoot')) {
