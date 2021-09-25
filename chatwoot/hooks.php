@@ -113,17 +113,16 @@ function hook_chatwoot_output($vars)
         $clientlang     = $apiResults['client']['language'];
 
         # Extra Meta
-        $clienttickets = $apiResults['stats']['numactivetickets'];
-        $clientcredit  = $apiResults['stats']['creditbalance'];
-        $clientrevenue = $apiResults['stats']['income'];
-        $clientunpaid  = $apiResults['stats']['numunpaidinvoices'];
+        $clienttickets     = $apiResults['stats']['numactivetickets'];
+        $clientcredit      = $apiResults['stats']['creditbalance'];
+        $clientrevenue     = $apiResults['stats']['income'];
+        $clientunpaid      = $apiResults['stats']['numunpaidinvoices'];
         $clientunpaidtotal = $apiResults['stats']['unpaidinvoicesamount'];
-        $clientoverdue = $apiResults['stats']['numoverdueinvoices'];
+        $clientoverdue     = $apiResults['stats']['numoverdueinvoices'];
         # $clientoverduetotal = $apiResults['stats']['overdueinvoicesbalance'];
         $isClientAffiliate = $apiResults["stats"]["isAffiliate"];
         $clientemailstatus = $apiResults["email_verified"];
         $customfieldvalue  = Capsule::table("tblcustomfieldsvalues")->where("fieldid", 236)->where("relid", $ClientID)->value('value');
-
 
         # Is Email Verified?
         if ($clientemailstatus == true) {
@@ -152,6 +151,7 @@ function hook_chatwoot_output($vars)
                   email: '$clientemail',
                   name: '$clientname',
                   identifier_hash: '$identifier_hash'
+                  company: '$customfieldvalue'
                 });
                 window.\$chatwoot.setCustomAttributes({
                   ID: '$ClientID',
