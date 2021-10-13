@@ -151,7 +151,7 @@ function hook_chatwoot_output($vars)
                 window.\$chatwoot.setUser('$ClientChatID', {
                   email: '$clientemail',
                   name: '$clientname',
-                  identifier_hash: '$identifier_hash'
+                  identifier_hash: '$identifier_hash',
                 });
                 window.\$chatwoot.setCustomAttributes({
                   ID: '$ClientID',
