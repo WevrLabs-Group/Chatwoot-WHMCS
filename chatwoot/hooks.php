@@ -115,18 +115,18 @@ function hook_chatwoot_output($vars)
         $clientlang     = $apiResults['client']['language'];
 
         # Extra Meta
-        $clienttickets = $apiResults['stats']['numactivetickets'];
-        $clientcredit  = $apiResults['stats']['creditbalance'];
-        $clientrevenue = $apiResults['stats']['income'];
-        $clientunpaid  = $apiResults['stats']['numunpaidinvoices'];
-        # $clientunpaidtotal = $apiResults['stats']['unpaidinvoicesamount'];
-        $clientoverdue = $apiResults['stats']['numoverdueinvoices'];
-        # $clientoverduetotal = $apiResults['stats']['overdueinvoicesbalance'];
-        $isClientAffiliate = $apiResults["stats"]["isAffiliate"];
-        $clientemailstatus = $apiResults["email_verified"];
+        $clienttickets          = $apiResults['stats']['numactivetickets'];
+        $clientcredit           = $apiResults['stats']['creditbalance'];
+        $clientrevenue          = $apiResults['stats']['income'];
+        $clientunpaid           = $apiResults['stats']['numunpaidinvoices'];
+        $clientunpaidtotal      = $apiResults['stats']['unpaidinvoicesamount'];
+        $clientoverdue          = $apiResults['stats']['numoverdueinvoices'];
+        $clientoverduetotal     = $apiResults['stats']['overdueinvoicesbalance'];
+        $isClientAffiliate      = $apiResults["stats"]["isAffiliate"];
+        $clientemailstatus      = $apiResults["email_verified"];
 
         # Is Email Verified?
-        if ($clientemailstatus == true) {
+        if ($clientemailstatus) {
             $clientemailver = 'Verified';
         } else {
             $clientemailver = 'Not Verified';
@@ -245,9 +245,10 @@ if ($whmcsver > 7) {
 function cwoot_whmcs_version()
 {
     $whmcsversion = Capsule::table('tblconfiguration')->where('setting', 'Version')->value('value');
-    $whmcsver     = substr($whmcsversion, 0, 1);
-    return $whmcsver;
+    return substr($whmcsversion, 0, 1);
 }
+
+$whmcsver = cwoot_whmcs_version();
 
 $LogoutHook = ($whmcsver > 7) ? 'UserLogout' : 'ClientLogout';
 
