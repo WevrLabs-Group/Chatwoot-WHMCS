@@ -43,7 +43,7 @@ if (!Capsule::schema()->hasTable('mod_chatwoot')) {
 }
 
 if (!Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->first()) {
-    Capsule::table('mod_chatwoot')->insert(['setting' => 'signing_hash', 'value' => 'jio23urfhjxo28ku2so90uso9u8sn']);
+    Capsule::table('mod_chatwoot')->insert(['setting' => 'signing_hash', 'value' => md5(time())]);
 }
 
 function chatwoot_config()
@@ -70,11 +70,11 @@ function chatwoot_config()
                 'Description'  => 'Paste your website widget JS code in this field. You can obtain it from your Chatwoot Dashboard > Inboxes > Website > Settings.<br /> For help, visit <a href="https://www.chatwoot.com/docs/product/channels/live-chat/create-website-channel" target="_blank">Chatwoot Docs</a>',
             ],
             'chatwoot_verhash'          => [
-                'FriendlyName' => 'Verification Hash (Required)',
+                'FriendlyName' => 'Secret Key (Required)',
                 'Type'         => 'text',
                 'Size'         => '',
                 'Default'      => '',
-                'Description'  => 'To make sure the conversations between the customers and the support agents are private and to disallow impersonation, you can setup identity validation in Chatwoot. <br />The key used to generate HMAC hash is unique for each webwidget and you can copy it from Inboxes -> Website Settings -> Configuration -> Identity Validation -> Copy the token shown there<br />To learn more about this, visit <a href="https://www.chatwoot.com/docs/product/channels/live-chat/sdk/identity-validation" target="_blank">Chatwoot Docs</a>',
+                'Description'  => 'To make sure the conversations between the customers and the support agents are private and to disallow impersonation, you can setup identity validation in Chatwoot. <br />The key used to generate HMAC hash is unique for each webwidget and you can copy it from Inboxes -> Widget Settings -> Configuration -> Identity Validation -> Copy the token shown there<br />To learn more about this, visit <a href="https://www.chatwoot.com/docs/product/channels/live-chat/sdk/identity-validation" target="_blank">Chatwoot Docs</a>',
             ],
             'chatwoot_position'         => [
                 'FriendlyName' => 'Chat Box Position',
@@ -127,7 +127,7 @@ function chatwoot_activate()
 
     if (!Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->first()) {
         try {
-            Capsule::table('mod_chatwoot')->insert(['setting' => 'signing_hash', 'value' => 'jio23urfhjxo28ku2so90uso9u8sn']);
+            Capsule::table('mod_chatwoot')->insert(['setting' => 'signing_hash', 'value' => md5(time())]);
         } catch (\Exception $e) {
             return ["status" => "error", "description" => "There was an error activating Chatwoot for WHMCS - Unable to create mod_chatwoot table: {$e->getMessage()}"];
         }
