@@ -26,7 +26,8 @@ use WHMCS\Database\Capsule;
 if (!Capsule::schema()->hasTable('mod_chatwoot')) {
     try {
         Capsule::schema()->create(
-            'mod_chatwoot', function ($table) {
+            'mod_chatwoot',
+            function ($table) {
                 $table->increments('id')->unique();
                 $table->string('setting', 100)->unique();
                 $table->string('value', 55250)->nullable();
@@ -47,12 +48,12 @@ if (!Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->first()) 
 
 function chatwoot_config()
 {
-    return array(
+    return [
         "name"        => "Chatwoot",
         "description" => "Chatwoot is a customer support tool for instant messaging channels which can help businesses to provide exceptional customer support. WHMCS module contributed by: <a href='https://wevrlabs.net/?utm_source=addon_link' target='_blank'>WevrLabs Hosting</a>",
         "version"     => "2.0.0",
         "author"      => "<a href='https://github.com/WevrLabs-Group/Chatwoot-WHMCS' target='_blank'><img alt='' width='100px' src='https://camo.githubusercontent.com/778ffdc9c0cb0bf52e04ffc22f3d392f028ceedc0f60c0e74741aac7c4375eb4/68747470733a2f2f73332e75732d776573742d322e616d617a6f6e6177732e636f6d2f67682d6173736574732e63686174776f6f742e636f6d2f6272616e642e737667' /><br />contributed by WevrLabs Hosting</a>",
-        "fields"      => array(
+        "fields"      => [
             'chatwoot_enable'           => [
                 'FriendlyName' => 'Enable Chatwoot',
                 'Type'         => 'yesno',
@@ -117,10 +118,8 @@ function chatwoot_config()
                 'Default'      => 'no',
                 'Description'  => 'check this box to enable the chat box when admin is logged in as client (not recommended, as it may mess up real users\' sessions, so enable this option only for debugging purposes and make sure to logout of the user account to trigger session reset.',
             ],
-        ),
-    );
-
-    return $configarray;
+        ],
+    ];
 }
 
 function chatwoot_activate()
@@ -135,5 +134,4 @@ function chatwoot_activate()
     }
 
     return ['status' => 'success', 'description' => "Chatwoot for WHMCS has been successfully activated! Don't forget to configure the settings below!"];
-
 }

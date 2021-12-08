@@ -47,10 +47,8 @@ function hook_chatwoot_output($vars)
     $signing_hash = Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->value('value');
 
     # ignore if admin
-    if (empty($chatwoot_admin)) {
-        if (isset($_SESSION['adminid'])) {
-            return;
-        }
+    if (empty($chatwoot_admin) && isset($_SESSION['adminid'])) {
+        return;
     }
 
     # Disable or Enable Chatwoot
@@ -82,6 +80,8 @@ function hook_chatwoot_output($vars)
     # Fetch labels
     if (!is_null($user)) {
         $chatwoot_label = $chatwoot_setlabelloggedin;
+    } else {
+        $chatwoot_label = $chatwoot_setlabel;
     }
 
     # Get client ID and set contact ID
