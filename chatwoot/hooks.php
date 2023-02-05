@@ -69,8 +69,9 @@ function hook_chatwoot_output($vars)
     }
 
     # user basic info
-    $client       = CurrentUser::client(); //Menu::context('client');
-    $user         = CurrentUser::user();
+    $currentUser = new CurrentUser;
+    $client = $currentUser->client();
+    $user = $currentUser->user();
     $ipaddress    = $_SERVER['REMOTE_ADDR'];
     $ip           = gethostbyaddr($ipaddress);
     $currentpage  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
@@ -85,7 +86,7 @@ function hook_chatwoot_output($vars)
     }
 
     # Get client ID and set contact ID
-    if ($user && $client && $user->isOwner(CurrentUser::client())) {
+    if ($user && $client && $user->isOwner( $client)) {
         $ClientID = $client->id; //$vars['clientsdetails']['id'];
     } elseif ($user) {
         $ownedClients = $user->ownedClients()->all();
