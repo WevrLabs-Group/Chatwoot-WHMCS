@@ -2,10 +2,10 @@
 
 /***************************************************************************
 // *                                                                       *
-// * Chatwoot WHMCS Addon (v2.0.0).                                        *
-// * This addon modules enables you integrate Chatwoot with your WHMCS     *
+// * Chatwoot WHMCS Addon (v2.0.3).                                        *
+// * This addon module enables you to integrate Chatwoot with your WHMCS    *
 //   and leverage its powerful features.                                   *
-// * Tested on WHMCS Version: v8.2.1                                       *
+// * Tested on WHMCS Version: v8.12.                                       *
 // * For assistance on how to use and setup Chatwoot, visit                *
 //   https://www.chatwoot.com/docs/channels/website                        *
 // *                                                                       *
