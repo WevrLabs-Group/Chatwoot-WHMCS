@@ -89,8 +89,9 @@ function hook_chatwoot_output($vars)
     if ($user && $client && $user->isOwner( $client)) {
         $ClientID = $client->id; //$vars['clientsdetails']['id'];
     } elseif ($user) {
-        $ownedClients = $user->ownedClients()->all();
-        $ClientID     = $ownedClients[0]['id'];
+        //$ownedClients = $user->ownedClients()->all();
+        //$ClientID     = $ownedClients[0]['id'];
+		$ClientID = $client->id;
     }
 
     if (!is_null($user)) {
@@ -153,6 +154,7 @@ function hook_chatwoot_output($vars)
                   email: '$clientemail',
                   name: '$clientname',
                   identifier_hash: '$identifier_hash',
+				  company_name: '$clientcompany',
                 });
                 window.\$chatwoot.setCustomAttributes({
                   ID: '$ClientID',
@@ -162,7 +164,6 @@ function hook_chatwoot_output($vars)
                   State: '$clientstate',
                   'Post Code': '$clientpostcode',
                   Country: '$clientcountry',
-                  Company: '$clientcompany',
                   'Active Tickets': '$clienttickets',
                   'Credit Balance': '$clientcredit',
                   'Revenue': '$clientrevenue',
@@ -178,7 +179,8 @@ function hook_chatwoot_output($vars)
                   'User System': '$user_os',
                 });
                 window.\$chatwoot.deleteCustomAttribute('Test Attribute')
-                window.\$chatwoot.setLabel('$chatwoot_label')
+                window.\$chatwoot.setLabel('$chatwoot_setlabelloggedin')
+				window.\$chatwoot.removeLabel('$chatwoot_setlabel');
                 window.\$chatwoot.setLocale('$chatwoot_lang')
                 window.chatwootSettings = {
                   position: '$chatwoot_position',
@@ -253,6 +255,27 @@ $whmcsver = cwoot_whmcs_version();
 
 $LogoutHook = ($whmcsver > 7) ? 'UserLogout' : 'ClientLogout';
 
+function ViewClientSwitchAccount($vars) {
+	
+	$url = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+    if (str_contains($url, '/user/accounts')) {
+
+        $output .= <<<HTML
+<!-- Chatwoot Logout Code -->
+<script>
+	document.addEventListener('readystatechange', event => {
+		window.\$chatwoot.reset()
+	});
+</script>
+<!-- Chatwoot End Logout Code -->
+HTML;
+
+        return $output;
+    }
+}
+
+add_hook("ClientAreaHeaderOutput", 1, "ViewClientSwitchAccount");
 add_hook('ClientAreaFooterOutput', 1, 'hook_chatwoot_output');
 add_hook($LogoutHook, 1, 'hook_chatwoot_logout_output');
 
