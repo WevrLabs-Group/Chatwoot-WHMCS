@@ -2,10 +2,10 @@
 
 /***************************************************************************
 // *                                                                       *
-// * Chatwoot WHMCS Addon (v2.0.0).                                        *
-// * This addon modules enables you integrate Chatwoot with your WHMCS     *
+// * Chatwoot WHMCS Addon (v2.0.3).                                        *
+// * This addon module enables you to integrate Chatwoot with your WHMCS    *
 //   and leverage its powerful features.                                   *
-// * Tested on WHMCS Version: v8.2.1                                       *
+// * Tested on WHMCS Version: v8.12.                                       *
 // * For assistance on how to use and setup Chatwoot, visit                *
 //   https://www.chatwoot.com/docs/channels/website                        *
 // *                                                                       *
@@ -50,9 +50,9 @@ function chatwoot_config()
 {
     return [
         "name"        => "Chatwoot",
-        "description" => "Chatwoot is a customer support tool for instant messaging channels which can help businesses to provide exceptional customer support. WHMCS module contributed by: <a href='https://wevrlabs.net/?utm_source=addon_link' target='_blank'>WevrLabs Hosting</a>",
-        "version"     => "2.0.0",
-        "author"      => "<a href='https://github.com/WevrLabs-Group/Chatwoot-WHMCS' target='_blank'><img alt='' width='100px' src='https://camo.githubusercontent.com/778ffdc9c0cb0bf52e04ffc22f3d392f028ceedc0f60c0e74741aac7c4375eb4/68747470733a2f2f73332e75732d776573742d322e616d617a6f6e6177732e636f6d2f67682d6173736574732e63686174776f6f742e636f6d2f6272616e642e737667' /><br />contributed by WevrLabs Hosting</a>",
+        "description" => "Chatwoot is a customer support tool for instant messaging channels that can help businesses provide exceptional customer support. WHMCS module contributed by: <a href='https://wevrlabs.net/?utm_source=addon_link' target='_blank'>WevrLabs Hosting</a>",
+        "version"     => "2.0.3",
+        "author"      => "<a href='https://github.com/WevrLabs-Group/Chatwoot-WHMCS' target='_blank'><img src='https://dash.wevrlabs.net/logo.svg' alt='Contributed by WevrLabs Hosting' width='135px' /></a>",
         "fields"      => [
             'chatwoot_enable'           => [
                 'FriendlyName' => 'Enable Chatwoot',
