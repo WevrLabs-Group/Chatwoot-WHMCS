@@ -123,6 +123,7 @@ function hook_chatwoot_output($vars)
         $isClientAffiliate      = $apiResults["stats"]["isAffiliate"];
         $clientemailstatus      = $apiResults["email_verified"];
         $customfieldvalue       = Capsule::table("tblcustomfieldsvalues")->where("fieldid", 236)->where("relid", $ClientID)->value('value');
+        $group                  = strtolower(Capsule::table('tblclientgroups')->where('id', $apiResults['groupid'])->value('groupname'));
 
         # Is Email Verified?
         if ($clientemailstatus) {
@@ -195,9 +196,10 @@ function hook_chatwoot_output($vars)
                   'customer_number': '$customfieldvalue',
                 });
                 window.\$chatwoot.deleteCustomAttribute('Test Attribute');
-                window.\$chatwoot.setLabel('$chatwoot_setlabelloggedin');
-				window.\$chatwoot.removeLabel('$chatwoot_setlabel');
+                window.\$chatwoot.removeLabel('$chatwoot_setlabel');
                 window.\$chatwoot.setLocale('$chatwoot_lang');
+                window.\$chatwoot.setLabel('$chatwoot_setlabelloggedin');
+                window.\$chatwoot.setLabel('$group');
               });
             </script>";
     } else {
