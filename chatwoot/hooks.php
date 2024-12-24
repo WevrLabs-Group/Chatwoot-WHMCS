@@ -172,7 +172,7 @@ function hook_chatwoot_output($vars)
                   email: '$clientemail',
                   name: '$clientname',
                   identifier_hash: '$identifier_hash',
-                  company_name: '$customfieldvalue - $clientcompany',
+                  company_name: '$clientcompany',
                 });
                 window.\$chatwoot.setCustomAttributes({
                   'ID': '$ClientID',
@@ -191,8 +191,8 @@ function hook_chatwoot_output($vars)
                   'Account Overdue': '$clientoverduetotal',
                   'Email Status': '$clientemailver',
                   'Is Affiliate': '$clientaffiliate',
-                  'Customer Number': '$customfieldvalue',
                   'Current Page': '$currentpage',
+                  'customer_number': '$customfieldvalue',
                 });
                 window.\$chatwoot.deleteCustomAttribute('Test Attribute');
                 window.\$chatwoot.setLabel('$chatwoot_setlabelloggedin');
@@ -258,7 +258,7 @@ function ViewClientSwitchAccount($vars)
 
     $url = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
-    if (str_contains($url, '/user/accounts')) {
+    if (str_contains($url, '/user/accounts') || str_contains($url, '/login')) {
 
         $output .= <<<HTML
 <!-- Chatwoot Logout Code -->
