@@ -102,17 +102,19 @@ function hook_chatwoot_output($vars)
         $apiResults  = localAPI('GetClientsDetails', $apiPostData);
 
         # Client Info
-        $clientemail    = $apiResults['client']['email'];
-        $clientname     = $apiResults['client']['fullname'];
-        $clientphone    = $apiResults['client']['phonenumberformatted'];
-        $clientcompany  = $apiResults['client']['companyname'];
-        $clientcountry  = $apiResults['client']['countryname'];
-        $clientcity     = $apiResults['client']['city'];
-        $clientstate    = $apiResults['client']['fullstate'];
-        $clientpostcode = $apiResults['client']['postcode'];
-        $clientlang     = $apiResults['client']['language'];
+        $clientemail    	= $apiResults['client']['email'];
+        $clientname     	= $apiResults['client']['fullname'];
+        $clientphone    	= str_ireplace('.', '', $apiResults['client']['phonenumberformatted']);
+        $clientcompany  	= $apiResults['client']['companyname'];
+        $clientcountry  	= $apiResults['client']['countryname'];
+        $clientcountryCode  = $apiResults['client']['countrycode'];
+        $clientcity     	= $apiResults['client']['city'];
+        $clientstate    	= $apiResults['client']['fullstate'];
+        $clientpostcode 	= $apiResults['client']['postcode'];
+        $clientlang     	= $apiResults['client']['language'];
 
         # Extra Meta
+        $clientnotes            = $apiResults['client']['notes'];
         $clienttickets          = $apiResults['stats']['numactivetickets'];
         $clientcredit           = $apiResults['stats']['creditbalance'];
         $clientrevenue          = $apiResults['stats']['income'];
@@ -120,8 +122,8 @@ function hook_chatwoot_output($vars)
         $clientunpaidtotal      = $apiResults['stats']['unpaidinvoicesamount'];
         $clientoverdue          = $apiResults['stats']['numoverdueinvoices'];
         $clientoverduetotal     = $apiResults['stats']['overdueinvoicesbalance'];
-        $isClientAffiliate      = $apiResults["stats"]["isAffiliate"];
-        $clientemailstatus      = $apiResults["email_verified"];
+        $isClientAffiliate      = $apiResults['stats']['isAffiliate'];
+        $clientemailstatus      = $apiResults['client']['email_verified'];
         $customfieldvalue       = Capsule::table("tblcustomfieldsvalues")->where("fieldid", 236)->where("relid", $ClientID)->value('value');
         $group                  = strtolower(Capsule::table('tblclientgroups')->where('id', $apiResults['groupid'])->value('groupname'));
 
@@ -174,26 +176,24 @@ function hook_chatwoot_output($vars)
                   name: '$clientname',
                   identifier_hash: '$identifier_hash',
                   company_name: '$clientcompany',
+				  country_code: '$clientcountryCode',
+				  city: '$clientstate',
+				  description: '$clientnotes',
                 });
                 window.\$chatwoot.setCustomAttributes({
-                  'ID': '$ClientID',
-                  'Phone': '$clientphone',
-                  'Language': '$clientlang',
-                  'City': '$clientcity',
-                  'State': '$clientstate',
-                  'Post Code': '$clientpostcode',
-                  'Country': '$clientcountry',
-                  'Active Tickets': '$clienttickets',
-                  'Credit Balance': '$clientcredit',
-                  'Revenue': '$clientrevenue',
-                  'Unpaid Invoices': '$clientunpaid',
-                  'Account Unpaid': '$clientunpaidtotal',
-                  'Overdue Invoices': '$clientoverdue',
-                  'Account Overdue': '$clientoverduetotal',
-                  'Email Status': '$clientemailver',
-                  'Is Affiliate': '$clientaffiliate',
-                  'Current Page': '$currentpage',
-                  'customer_number': '$customfieldvalue',
+                    'ID': '$ClientID',
+                    'client_phone_number': '$clientphone',
+                    'Post Code': '$clientpostcode',
+                    'Active Tickets': '$clienttickets',
+                    'credit_balance': '$clientcredit',
+                    'Unpaid Invoices': '$clientunpaid',
+                    'outstaning_total': '$clientunpaidtotal',
+                    'Overdue Invoices': '$clientoverdue',
+                    'Account Overdue': '$clientoverduetotal',
+                    'Email Status': '$clientemailver',
+                    'Is Affiliate': '$clientaffiliate',
+                    'last_visited_page': '$currentpage',
+                    'customer_number': '$customfieldvalue',
                 });
                 window.\$chatwoot.deleteCustomAttribute('Test Attribute');
                 window.\$chatwoot.removeLabel('$chatwoot_setlabel');
