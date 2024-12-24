@@ -91,7 +91,7 @@ function hook_chatwoot_output($vars)
     }
 
     if (!is_null($user)) {
-        $ClientChatID    = hash_hmac("sha256", $ClientID, verification_hash);
+        $ClientChatID    = hash_hmac("sha256", $ClientID, 'nQ1ayoG5bu580LZkSxMJiO2');
         $identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
     }
 
