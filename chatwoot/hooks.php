@@ -40,8 +40,6 @@ function hook_chatwoot_output($vars)
     $chatwoot_setlabelloggedin = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_setlabelloggedin')->value('value');
 
     $chatwoot_admin = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_enableonadmin')->value('value');
-    $signing_hash   = Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->value('value');
-
 
     # ignore if admin
     if (empty($chatwoot_admin) && isset($_SESSION['adminid'])) {
@@ -93,7 +91,7 @@ function hook_chatwoot_output($vars)
     }
 
     if (!is_null($user)) {
-        $ClientChatID    = hash_hmac("sha256", $ClientID, $signing_hash);
+        $ClientChatID    = hash_hmac("sha256", $ClientID, verification_hash);
         $identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
     }
 
