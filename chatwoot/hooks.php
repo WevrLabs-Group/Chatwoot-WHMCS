@@ -2,10 +2,9 @@
 
 /***************************************************************************
 // *                                                                       *
-// * Chatwoot WHMCS Addon (v2.0.0).                                        *
-// * This addon modules enables you integrate Chatwoot with your WHMCS     *
+// * Chatwoot WHMCS Addon                                                  *
+// * This addon module enables you to integrate Chatwoot with your WHMCS   *
 //   and leverage its powerful features.                                   *
-// * Tested on WHMCS Version: v8.2.1                                       *
 // * For assistance on how to use and setup Chatwoot, visit                *
 //   https://www.chatwoot.com/docs/channels/website                        *
 // *                                                                       *
@@ -27,29 +26,27 @@ use WHMCS\Database\Capsule;
 function hook_chatwoot_output($vars)
 {
 
-    # ignore if admin
-    if (isset($_SESSION['adminid'])) {
-        return;
-    }
-
-    $isenabled = Capsule::table('tbladdonmodules')->select('value')->where('module', '=', 'chatwoot')->where('setting', '=', 'chatwoot_enable')->where('value', 'on')->count();
-
-    $chatwoot_jscode = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_jscode')->value('value');
-
-    $verification_hash = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
-
-    $chatwoot_position = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_position')->value('value');
-
-    $chatwoot_bubble = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_bubble')->value('value');
-
-    $chatwoot_lang_setting = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_lang')->value('value');
+    $isenabled              = Capsule::table('tbladdonmodules')->select('value')->where('module', '=', 'chatwoot')->where('setting', '=', 'chatwoot_enable')->where('value', 'on')->count();
+    $chatwoot_url           = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_url')->value('value');
+    $chatwoot_token         = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_token')->value('value');
+    $verification_hash      = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
+    $chatwoot_position      = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_position')->value('value');
+    $chatwoot_bubble        = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_bubble')->value('value');
+    $chatwoot_launcherTitle = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_launcherTitle')->value('value');
+    $chatwoot_dark          = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_dark')->value('value');
+    $chatwoot_lang_setting  = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_lang')->value('value');
 
     $chatwoot_setlabel         = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_setlabel')->value('value');
     $chatwoot_setlabelloggedin = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_setlabelloggedin')->value('value');
 
     $chatwoot_admin = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_enableonadmin')->value('value');
+    $signing_hash   = Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->value('value');
 
-    $signing_hash = Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->value('value');
+
+    # ignore if admin
+    if (empty($chatwoot_admin) && isset($_SESSION['adminid'])) {
+        return;
+    }
 
     # Disable or Enable Chatwoot
     if (empty($isenabled)) {
@@ -63,14 +60,20 @@ function hook_chatwoot_output($vars)
         $chatwoot_bubble = 'expanded_bubble';
     }
 
+    # dark mode
+    if ($chatwoot_dark == 'on') {
+        $chatwoot_dark = 'auto';
+    }
+
     # widget lang
     if ($chatwoot_lang_setting) {
         $chatwoot_lang = cw_langCode(ucfirst($vars['language']));
     }
 
     # user basic info
-    $client       = CurrentUser::client(); //Menu::context('client');
-    $user         = CurrentUser::user();
+    $currentUser  = new CurrentUser;
+    $client       = $currentUser->client();
+    $user         = $currentUser->user();
     $ipaddress    = $_SERVER['REMOTE_ADDR'];
     $ip           = gethostbyaddr($ipaddress);
     $currentpage  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
@@ -80,14 +83,17 @@ function hook_chatwoot_output($vars)
     # Fetch labels
     if (!is_null($user)) {
         $chatwoot_label = $chatwoot_setlabelloggedin;
+    } else {
+        $chatwoot_label = $chatwoot_setlabel;
     }
 
-    # Get contact ID and set chat ID
+    # Get client ID and set contact ID
     if ($user && $client && $user->isOwner($client)) {
-        $ClientID = $client->id; //$vars['clientsdetails']['id'];
+        $ClientID = $client->id;
     } elseif ($user) {
-        $ownedClients = $user->ownedClients()->all();
-        $ClientID     = $ownedClients[0]['id'];
+        //$ownedClients = $user->ownedClients()->all();
+        //$ClientID     = $ownedClients[0]['id'];
+        $ClientID = $client->id;
     }
 
     if (!is_null($user)) {
@@ -95,7 +101,7 @@ function hook_chatwoot_output($vars)
         $identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
     }
 
-    # build contact Info
+    # build contact info
     if (!is_null($user)) {
 
         $apiPostData = array('clientid' => $ClientID, 'stats' => true);
@@ -103,7 +109,7 @@ function hook_chatwoot_output($vars)
 
         # Client Info
         $clientemail    = $apiResults['client']['email'];
-        $clientname     = '#' . $ClientID . ' - ' . $apiResults['client']['fullname'];
+        $clientname     = $apiResults['client']['fullname'];
         $clientphone    = $apiResults['client']['phonenumberformatted'];
         $clientcompany  = $apiResults['client']['companyname'];
         $clientcountry  = $apiResults['client']['countryname'];
@@ -113,19 +119,19 @@ function hook_chatwoot_output($vars)
         $clientlang     = $apiResults['client']['language'];
 
         # Extra Meta
-        $clienttickets     = $apiResults['stats']['numactivetickets'];
-        $clientcredit      = $apiResults['stats']['creditbalance'];
-        $clientrevenue     = $apiResults['stats']['income'];
-        $clientunpaid      = $apiResults['stats']['numunpaidinvoices'];
-        $clientunpaidtotal = $apiResults['stats']['unpaidinvoicesamount'];
-        $clientoverdue     = $apiResults['stats']['numoverdueinvoices'];
-        # $clientoverduetotal = $apiResults['stats']['overdueinvoicesbalance'];
-        $isClientAffiliate = $apiResults["stats"]["isAffiliate"];
-        $clientemailstatus = $apiResults["email_verified"];
-        $customfieldvalue  = Capsule::table("tblcustomfieldsvalues")->where("fieldid", 236)->where("relid", $ClientID)->value('value');
+        $clienttickets          = $apiResults['stats']['numactivetickets'];
+        $clientcredit           = $apiResults['stats']['creditbalance'];
+        $clientrevenue          = $apiResults['stats']['income'];
+        $clientunpaid           = $apiResults['stats']['numunpaidinvoices'];
+        $clientunpaidtotal      = $apiResults['stats']['unpaidinvoicesamount'];
+        $clientoverdue          = $apiResults['stats']['numoverdueinvoices'];
+        $clientoverduetotal     = $apiResults['stats']['overdueinvoicesbalance'];
+        $isClientAffiliate      = $apiResults["stats"]["isAffiliate"];
+        $clientemailstatus      = $apiResults["email_verified"];
+        $customfieldvalue       = Capsule::table("tblcustomfieldsvalues")->where("fieldid", 236)->where("relid", $ClientID)->value('value');
 
         # Is Email Verified?
-        if ($clientemailstatus == true) {
+        if ($clientemailstatus) {
             $clientemailver = 'Verified';
         } else {
             $clientemailver = 'Not Verified';
@@ -139,7 +145,28 @@ function hook_chatwoot_output($vars)
         }
     }
 
-    # Now let's prepare our code for final output
+    # prepare widget code
+    $chatwoot_jscode = "
+            <script>
+  window.chatwootSettings = {'position':'$chatwoot_position','type':'$chatwoot_bubble','launcherTitle':'$chatwoot_launcherTitle','darkMode': '$chatwoot_dark'};
+  (function(d,t) {
+    var BASE_URL='$chatwoot_url';
+    var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+    g.src=BASE_URL+'/packs/js/sdk.js';
+    g.defer = true;
+    g.async = true;
+    s.parentNode.insertBefore(g,s);
+    g.onload=function(){
+      window.chatwootSDK.run({
+        websiteToken: '$chatwoot_token',
+        baseUrl: BASE_URL
+      })
+    }
+  })(document,'script');
+</script>
+";
+
+    # Now let's set the final output
 
     if (!is_null($user)) {
 
@@ -151,7 +178,7 @@ function hook_chatwoot_output($vars)
                   email: '$clientemail',
                   name: '$clientname',
                   identifier_hash: '$identifier_hash',
-                  company: '$customfieldvalue',
+                  company_name: '$customfieldvalue - $clientcompany',
                 });
                 window.\$chatwoot.setCustomAttributes({
                   ID: '$ClientID',
@@ -161,7 +188,6 @@ function hook_chatwoot_output($vars)
                   State: '$clientstate',
                   'Post Code': '$clientpostcode',
                   Country: '$clientcountry',
-                  Company: '$clientcompany',
                   'Active Tickets': '$clienttickets',
                   'Credit Balance': '$clientcredit',
                   'Revenue': '$clientrevenue',
@@ -177,13 +203,10 @@ function hook_chatwoot_output($vars)
                   'User Browser': '$user_browser',
                   'User System': '$user_os',
                 });
-                window.\$chatwoot.deleteCustomAttribute('Test Attribute')
-                window.\$chatwoot.setLabel('$chatwoot_label')
-                window.\$chatwoot.setLocale('$chatwoot_lang')
-                window.chatwootSettings = {
-                  position: '$chatwoot_position',
-                  type: '$chatwoot_bubble',
-                }
+                window.\$chatwoot.deleteCustomAttribute('Test Attribute');
+                window.\$chatwoot.setLabel('$chatwoot_setlabelloggedin');
+				window.\$chatwoot.removeLabel('$chatwoot_setlabel');
+                window.\$chatwoot.setLocale('$chatwoot_lang');
               });
             </script>";
     } else {
@@ -191,12 +214,8 @@ function hook_chatwoot_output($vars)
             $chatwoot_jscode
             <script>
               window.addEventListener('chatwoot:ready', function () {
-                window.\$chatwoot.setLabel('$chatwoot_label')
-                window.\$chatwoot.setLocale('$chatwoot_lang')
-                window.chatwootSettings = {
-                  position: '$chatwoot_position',
-                  type: '$chatwoot_bubble',
-                };
+                window.\$chatwoot.setLabel('$chatwoot_label');
+                window.\$chatwoot.setLocale('$chatwoot_lang');
                 window.\$chatwoot.setCustomAttributes({
                   'IP Address': '$ip',
                   'Current Page': '$currentpage',
@@ -206,7 +225,6 @@ function hook_chatwoot_output($vars)
               });
             </script>";
     }
-    //logActivity("[CW Debug]: "print_r($vars, true) , $ClientID);
     return $chatwoot_output;
 }
 
@@ -247,12 +265,34 @@ if ($whmcsver > 7) {
 function cwoot_whmcs_version()
 {
     $whmcsversion = Capsule::table('tblconfiguration')->where('setting', 'Version')->value('value');
-    $whmcsver     = substr($whmcsversion, 0, 1);
-    return $whmcsver;
+    return substr($whmcsversion, 0, 1);
 }
 
+$whmcsver   = cwoot_whmcs_version();
 $LogoutHook = ($whmcsver > 7) ? 'UserLogout' : 'ClientLogout';
 
+function ViewClientSwitchAccount($vars)
+{
+
+    $url = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+    if (str_contains($url, '/user/accounts')) {
+
+        $output .= <<<HTML
+<!-- Chatwoot Logout Code -->
+<script>
+	document.addEventListener('readystatechange', event => {
+		window.\$chatwoot.reset()
+	});
+</script>
+<!-- Chatwoot End Logout Code -->
+HTML;
+
+        return $output;
+    }
+}
+
+add_hook("ClientAreaHeaderOutput", 1, "ViewClientSwitchAccount");
 add_hook('ClientAreaFooterOutput', 1, 'hook_chatwoot_output');
 add_hook($LogoutHook, 1, 'hook_chatwoot_logout_output');
 
