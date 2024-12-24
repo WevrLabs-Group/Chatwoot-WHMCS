@@ -42,10 +42,6 @@ if (!Capsule::schema()->hasTable('mod_chatwoot')) {
     }
 }
 
-if (!Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->first()) {
-    Capsule::table('mod_chatwoot')->insert(['setting' => 'signing_hash', 'value' => md5(time())]);
-}
-
 function chatwoot_config()
 {
     return [
@@ -146,14 +142,6 @@ function chatwoot_config()
 
 function chatwoot_activate()
 {
-
-    if (!Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->first()) {
-        try {
-            Capsule::table('mod_chatwoot')->insert(['setting' => 'signing_hash', 'value' => md5(time())]);
-        } catch (\Exception $e) {
-            return ["status" => "error", "description" => "There was an error activating Chatwoot for WHMCS - Unable to create mod_chatwoot table: {$e->getMessage()}"];
-        }
-    }
 
     return ['status' => 'success', 'description' => "Chatwoot for WHMCS has been successfully activated! Don't forget to configure the settings below!"];
 }
