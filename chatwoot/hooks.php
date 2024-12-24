@@ -26,18 +26,20 @@ use WHMCS\Database\Capsule;
 function hook_chatwoot_output($vars)
 {
 
-    $isenabled             = Capsule::table('tbladdonmodules')->select('value')->where('module', '=', 'chatwoot')->where('setting', '=', 'chatwoot_enable')->where('value', 'on')->count();
-    $chatwoot_jscode       = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_jscode')->value('value');
-    $verification_hash     = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
-    $chatwoot_position     = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_position')->value('value');
-    $chatwoot_bubble       = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_bubble')->value('value');
-    $chatwoot_lang_setting = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_lang')->value('value');
-    $chatwoot_admin        = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_enableonadmin')->value('value');
-    $signing_hash          = Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->value('value');
+    $isenabled              = Capsule::table('tbladdonmodules')->select('value')->where('module', '=', 'chatwoot')->where('setting', '=', 'chatwoot_enable')->where('value', 'on')->count();
+    $chatwoot_url           = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_url')->value('value');
+    $chatwoot_token         = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_token')->value('value');
+    $verification_hash      = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
+    $chatwoot_position      = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_position')->value('value');
+    $chatwoot_bubble        = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_bubble')->value('value');
+    $chatwoot_launcherTitle = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_launcherTitle')->value('value');
+    $chatwoot_dark          = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_dark')->value('value');
+    $chatwoot_lang_setting  = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_lang')->value('value');
 
     $chatwoot_setlabel         = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_setlabel')->value('value');
     $chatwoot_setlabelloggedin = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_setlabelloggedin')->value('value');
 
+    $chatwoot_admin = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_enableonadmin')->value('value');
 
     # ignore if admin
     if (empty($chatwoot_admin) && isset($_SESSION['adminid'])) {
@@ -56,6 +58,11 @@ function hook_chatwoot_output($vars)
         $chatwoot_bubble = 'expanded_bubble';
     }
 
+    # dark mode
+    if ($chatwoot_dark == 'on') {
+        $chatwoot_dark = 'auto';
+    }
+
     # widget lang
     if ($chatwoot_lang_setting) {
         $chatwoot_lang = cw_langCode(ucfirst($vars['language']));
@@ -65,11 +72,7 @@ function hook_chatwoot_output($vars)
     $currentUser  = new CurrentUser;
     $client       = $currentUser->client();
     $user         = $currentUser->user();
-    $ipaddress    = $_SERVER['REMOTE_ADDR'];
-    $ip           = gethostbyaddr($ipaddress);
     $currentpage  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-    $user_os      = getOS();
-    $user_browser = getBrowser();
 
     # Fetch labels
     if (!is_null($user)) {
@@ -79,7 +82,7 @@ function hook_chatwoot_output($vars)
     }
 
     # Get client ID and set contact ID
-    if ($user && $client && $user->isOwner( $client)) {
+    if ($user && $client && $user->isOwner($client)) {
         $ClientID = $client->id;
     } elseif ($user) {
         //$ownedClients = $user->ownedClients()->all();
@@ -88,8 +91,8 @@ function hook_chatwoot_output($vars)
     }
 
     if (!is_null($user)) {
-        $ClientChatID    = hash_hmac("sha256", $ClientID, $signing_hash);
-        $identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
+        $clientChatID    = hash_hmac("sha256", $ClientID, $verification_hash);
+        $identifier_hash = hash_hmac("sha256", $clientChatID, $verification_hash);
     }
 
     # build contact info
@@ -135,7 +138,28 @@ function hook_chatwoot_output($vars)
         }
     }
 
-    # Now let's prepare our code for the final output
+    # prepare widget code
+    $chatwoot_jscode = "
+            <script>
+  window.chatwootSettings = {'position':'$chatwoot_position','type':'$chatwoot_bubble','launcherTitle':'$chatwoot_launcherTitle','darkMode': '$chatwoot_dark'};
+  (function(d,t) {
+    var BASE_URL='$chatwoot_url';
+    var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+    g.src=BASE_URL+'/packs/js/sdk.js';
+    g.defer = true;
+    g.async = true;
+    s.parentNode.insertBefore(g,s);
+    g.onload=function(){
+      window.chatwootSDK.run({
+        websiteToken: '$chatwoot_token',
+        baseUrl: BASE_URL
+      })
+    }
+  })(document,'script');
+</script>
+";
+
+    # Now let's set the final output
 
     if (!is_null($user)) {
 
@@ -143,20 +167,20 @@ function hook_chatwoot_output($vars)
             "$chatwoot_jscode
             <script>
               window.addEventListener('chatwoot:ready', function () {
-                window.\$chatwoot.setUser('$ClientChatID', {
+                window.\$chatwoot.setUser('$clientChatID', {
                   email: '$clientemail',
                   name: '$clientname',
                   identifier_hash: '$identifier_hash',
                   company_name: '$clientcompany',
                 });
                 window.\$chatwoot.setCustomAttributes({
-                  ID: '$ClientID',
-                  Phone: '$clientphone',
-                  Language: '$clientlang',
-                  City: '$clientcity',
-                  State: '$clientstate',
+                  'ID': '$ClientID',
+                  'Phone': '$clientphone',
+                  'Language': '$clientlang',
+                  'City': '$clientcity',
+                  'State': '$clientstate',
                   'Post Code': '$clientpostcode',
-                  Country: '$clientcountry',
+                  'Country': '$clientcountry',
                   'Active Tickets': '$clienttickets',
                   'Credit Balance': '$clientcredit',
                   'Revenue': '$clientrevenue',
@@ -166,19 +190,12 @@ function hook_chatwoot_output($vars)
                   'Account Overdue': '$clientoverduetotal',
                   'Email Status': '$clientemailver',
                   'Is Affiliate': '$clientaffiliate',
-                  'IP Address': '$ip',
                   'Current Page': '$currentpage',
-                  'User Browser': '$user_browser',
-                  'User System': '$user_os',
                 });
-                window.\$chatwoot.deleteCustomAttribute('Test Attribute')
-                window.\$chatwoot.setLabel('$chatwoot_setlabelloggedin')
+                window.\$chatwoot.deleteCustomAttribute('Test Attribute');
+                window.\$chatwoot.setLabel('$chatwoot_setlabelloggedin');
                 window.\$chatwoot.removeLabel('$chatwoot_setlabel');
-                window.\$chatwoot.setLocale('$chatwoot_lang')
-                window.chatwootSettings = {
-                   position: '$chatwoot_position',
-                   type: '$chatwoot_bubble',
-                }
+                window.\$chatwoot.setLocale('$chatwoot_lang');
               });
             </script>";
     } else {
@@ -186,17 +203,10 @@ function hook_chatwoot_output($vars)
             $chatwoot_jscode
             <script>
               window.addEventListener('chatwoot:ready', function () {
-                window.\$chatwoot.setLabel('$chatwoot_label')
-                window.\$chatwoot.setLocale('$chatwoot_lang')
-                window.chatwootSettings = {
-                  position: '$chatwoot_position',
-                  type: '$chatwoot_bubble',
-                };
+                window.\$chatwoot.setLabel('$chatwoot_label');
+                window.\$chatwoot.setLocale('$chatwoot_lang');
                 window.\$chatwoot.setCustomAttributes({
-                  'IP Address': '$ip',
                   'Current Page': '$currentpage',
-                  'User Browser': '$user_browser',
-                  'User System': '$user_os',
                 });
               });
             </script>";
@@ -242,17 +252,17 @@ $whmcsver   = cwoot_whmcs_version();
 $LogoutHook = ($whmcsver > 7) ? 'UserLogout' : 'ClientLogout';
 
 function ViewClientSwitchAccount($vars) {
-	
-	$url = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
-    if (str_contains($url, '/user/accounts')) {
+    $url = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+    if (str_contains($url, '/user/accounts') || str_contains($url, '/login')) {
 
         $output .= <<<HTML
 <!-- Chatwoot Logout Code -->
 <script>
-	document.addEventListener('readystatechange', event => {
-		window.\$chatwoot.reset()
-	});
+    document.addEventListener('readystatechange', event => {
+        window.\$chatwoot.reset()
+    });
 </script>
 <!-- Chatwoot End Logout Code -->
 HTML;
@@ -269,69 +279,6 @@ add_hook($LogoutHook, 1, 'hook_chatwoot_logout_output');
 function cwoot_whmcs_version() {
     $whmcsversion = Capsule::table('tblconfiguration')->where('setting', 'Version')->value('value');
     return substr($whmcsversion, 0, 1);
-}
-
-function getOS()
-{
-
-    $user_agent  = $_SERVER['HTTP_USER_AGENT'];
-    $os_platform = "Unknown OS Platform";
-    $os_array    = array(
-        '/windows nt 6.3/i'     => 'Windows 8.1',
-        '/windows nt 6.2/i'     => 'Windows 8',
-        '/windows nt 6.1/i'     => 'Windows 7',
-        '/windows nt 6.0/i'     => 'Windows Vista',
-        '/windows nt 5.2/i'     => 'Windows Server 2003/XP x64',
-        '/windows nt 5.1/i'     => 'Windows XP',
-        '/windows xp/i'         => 'Windows XP',
-        '/windows nt 5.0/i'     => 'Windows 2000',
-        '/windows me/i'         => 'Windows ME',
-        '/win98/i'              => 'Windows 98',
-        '/win95/i'              => 'Windows 95',
-        '/win16/i'              => 'Windows 3.11',
-        '/macintosh|mac os x/i' => 'Mac OS X',
-        '/mac_powerpc/i'        => 'Mac OS 9',
-        '/linux/i'              => 'Linux',
-        '/ubuntu/i'             => 'Ubuntu',
-        '/iphone/i'             => 'iPhone',
-        '/ipod/i'               => 'iPod',
-        '/ipad/i'               => 'iPad',
-        '/android/i'            => 'Android',
-        '/blackberry/i'         => 'BlackBerry',
-        '/webos/i'              => 'Mobile',
-    );
-
-    foreach ($os_array as $regex => $value) {
-        if (preg_match($regex, $user_agent)) {
-            $os_platform = $value;
-        }
-    }
-    return $os_platform;
-}
-
-function getBrowser()
-{
-
-    $user_agent    = $_SERVER['HTTP_USER_AGENT'];
-    $browser       = "Unknown Browser";
-    $browser_array = array(
-        '/msie/i'      => 'Internet Explorer',
-        '/firefox/i'   => 'Firefox',
-        '/safari/i'    => 'Safari',
-        '/chrome/i'    => 'Chrome',
-        '/opera/i'     => 'Opera',
-        '/netscape/i'  => 'Netscape',
-        '/maxthon/i'   => 'Maxthon',
-        '/konqueror/i' => 'Konqueror',
-        '/mobile/i'    => 'Handheld Browser',
-    );
-
-    foreach ($browser_array as $regex => $value) {
-        if (preg_match($regex, $user_agent)) {
-            $browser = $value;
-        }
-    }
-    return $browser;
 }
 
 # to deal with langs
