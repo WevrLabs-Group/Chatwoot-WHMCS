@@ -26,15 +26,16 @@ use WHMCS\Database\Capsule;
 function hook_chatwoot_output($vars)
 {
 
-    $isenabled              = Capsule::table('tbladdonmodules')->select('value')->where('module', '=', 'chatwoot')->where('setting', '=', 'chatwoot_enable')->where('value', 'on')->count();
-    $chatwoot_url           = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_url')->value('value');
-    $chatwoot_token         = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_token')->value('value');
-    $verification_hash      = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
-    $chatwoot_position      = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_position')->value('value');
-    $chatwoot_bubble        = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_bubble')->value('value');
-    $chatwoot_launcherTitle = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_launcherTitle')->value('value');
-    $chatwoot_dark          = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_dark')->value('value');
-    $chatwoot_lang_setting  = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_lang')->value('value');
+    $isenabled                  = Capsule::table('tbladdonmodules')->select('value')->where('module', '=', 'chatwoot')->where('setting', '=', 'chatwoot_enable')->where('value', 'on')->count();
+    $chatwoot_url               = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_url')->value('value');
+    $chatwoot_api_access_token  = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_api_access_token')->value('value');
+    $chatwoot_token             = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_token')->value('value');
+    $verification_hash          = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
+    $chatwoot_position          = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_position')->value('value');
+    $chatwoot_bubble            = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_bubble')->value('value');
+    $chatwoot_launcherTitle     = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_launcherTitle')->value('value');
+    $chatwoot_dark              = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_dark')->value('value');
+    $chatwoot_lang_setting      = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_lang')->value('value');
 
     $chatwoot_setlabel         = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_setlabel')->value('value');
     $chatwoot_setlabelloggedin = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_setlabelloggedin')->value('value');
@@ -91,7 +92,7 @@ function hook_chatwoot_output($vars)
     }
 
     if (!is_null($user)) {
-        $ClientChatID    = hash_hmac("sha256", $ClientID, 'nQ1ayoG5bu580LZkSxMJiO2');
+        $ClientChatID    = hash_hmac("sha256", $ClientID, $chatwoot_api_access_token);
         $identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
     }
 

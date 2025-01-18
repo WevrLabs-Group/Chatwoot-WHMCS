@@ -47,7 +47,7 @@ function chatwoot_config()
     return [
         "name"        => "Chatwoot",
         "description" => "Chatwoot is a customer support tool for instant messaging channels that can help businesses provide exceptional customer support. WHMCS module contributed by: <a href='https://wevrlabs.net/?utm_source=addon_link' target='_blank'>WevrLabs Hosting</a>",
-        "version"     => "2.0.4",
+        "version"     => "2.0.5",
         "author"      => "<a href='https://github.com/WevrLabs-Group/Chatwoot-WHMCS' target='_blank'><img src='https://dash.wevrlabs.net/logo.svg' alt='Contributed by WevrLabs Hosting' width='135px' /></a>",
         "fields"      => [
             'chatwoot_enable'           => [
@@ -64,6 +64,14 @@ function chatwoot_config()
                 'Cols'         => '',
                 'Default'      => '',
                 'Description'  => 'Enter Chatwoot URL. Example: https://www.chatwoot.com',
+            ],
+            'chatwoot_api_access_token' => [
+                'FriendlyName' => 'Enter Your Chatwoot account API Token',
+                'Type'         => 'text',
+                'Rows'         => '',
+                'Cols'         => '',
+                'Default'      => '',
+                'Description'  => 'You can get this token by visiting your Profile settings → Access Token',
             ],
             'chatwoot_token'            => [
                 'FriendlyName' => 'Website Widget Token',
@@ -142,6 +150,5 @@ function chatwoot_config()
 
 function chatwoot_activate()
 {
-
     return ['status' => 'success', 'description' => "Chatwoot for WHMCS has been successfully activated! Don't forget to configure the settings below!"];
 }
