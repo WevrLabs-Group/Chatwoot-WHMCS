@@ -31,6 +31,7 @@ function hook_chatwoot_output($vars)
     $chatwoot_api_access_token  = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_api_access_token')->value('value');
     $chatwoot_token             = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_token')->value('value');
     $verification_hash          = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
+    $signing_hash               = Capsule::table('mod_chatwoot')->where('setting', 'signing_hash')->value('value');
     $chatwoot_position          = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_position')->value('value');
     $chatwoot_bubble            = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_bubble')->value('value');
     $chatwoot_launcherTitle     = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_launcherTitle')->value('value');
@@ -92,7 +93,7 @@ function hook_chatwoot_output($vars)
     }
 
     if (!is_null($user)) {
-        $ClientChatID    = hash_hmac("sha256", $ClientID, $chatwoot_api_access_token);
+        $ClientChatID    = hash_hmac("sha256", $ClientID, $signing_hash);
         $identifier_hash = hash_hmac("sha256", $ClientChatID, $verification_hash);
     }
 
