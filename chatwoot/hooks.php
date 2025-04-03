@@ -22,6 +22,7 @@ if (!defined("WHMCS")) {
 
 use WHMCS\Authentication\CurrentUser;
 use WHMCS\Database\Capsule;
+use WHMCS\Language\Language;
 
 function hook_chatwoot_output($vars)
 {
@@ -136,6 +137,15 @@ function hook_chatwoot_output($vars)
         } else {
             $clientaffiliate = 'No';
         }
+    }
+
+    if($chatwoot_position == "follow language") {
+        $isRTL = (bool) Lang::trans('isRTL');
+        $chatwoot_position = $isRTL ? "left" : "right";
+        
+    } else if ($chatwoot_position == "oppose language") {
+        $isRTL = (bool) Lang::trans('isRTL');
+        $chatwoot_position = $isRTL ? "right" : "left";
     }
 
     # prepare widget code
