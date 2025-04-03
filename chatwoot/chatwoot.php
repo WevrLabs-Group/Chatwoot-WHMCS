@@ -64,7 +64,7 @@ function chatwoot_config()
             'chatwoot_position'         => [
                 'FriendlyName' => 'Chat Box Position',
                 'Type'         => 'radio',
-                'Options'      => 'right,left',
+                'Options'      => 'right,left,follow language,oppose language',
                 'Default'      => 'right',
                 'Description'  => 'Set your chat box position, whether to be left or right in the page.',
             ],
