@@ -68,6 +68,13 @@ function chatwoot_config()
                 'Default'      => 'right',
                 'Description'  => 'Set your chat box position, whether to be left or right in the page.',
             ],
+            'chatwoot_theme_direction'           => [
+                'FriendlyName' => 'Follow Theme Direction',
+                'Type'         => 'yesno',
+                'Size'         => '55',
+                'Default'      => 'no',
+                'Description'  => 'Check to allow the bubble to follow them direction. iff the direction is right it will follow the site language correctly, if it was left it will be reversed',
+            ],
             'chatwoot_bubble'           => [
                 'FriendlyName' => 'Chat Box Bubble',
                 'Type'         => 'radio',

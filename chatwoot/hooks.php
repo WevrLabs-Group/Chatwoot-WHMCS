@@ -22,6 +22,7 @@ if (!defined("WHMCS")) {
 
 use WHMCS\Authentication\CurrentUser;
 use WHMCS\Database\Capsule;
+use WHMCS\Language\Language;
 
 function hook_chatwoot_output($vars)
 {
@@ -31,6 +32,7 @@ function hook_chatwoot_output($vars)
     $chatwoot_token         = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_token')->value('value');
     $verification_hash      = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_verhash')->value('value');
     $chatwoot_position      = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_position')->value('value');
+    $chatwoot_theme_direction = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_theme_direction')->value('value');
     $chatwoot_bubble        = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_bubble')->value('value');
     $chatwoot_launcherTitle = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_launcherTitle')->value('value');
     $chatwoot_dark          = Capsule::table('tbladdonmodules')->where('module', 'chatwoot')->where('setting', 'chatwoot_dark')->value('value');
@@ -136,6 +138,15 @@ function hook_chatwoot_output($vars)
         } else {
             $clientaffiliate = 'No';
         }
+    }
+
+    if($chatwoot_theme_direction == "on") {
+        $rtlLanguages = ["arabic", "hebrew", "persian", "urdu", "pashto", "yiddish", "sindhi"];
+        $isRTL = in_array($vars['language'], $rtlLanguages);
+        if($chatwoot_position == "right")
+            $chatwoot_position = $isRTL ? "left" : "right";
+        else
+            $chatwoot_position = $isRTL ? "right" : "left"; 
     }
 
     # prepare widget code
